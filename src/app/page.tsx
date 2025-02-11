@@ -2,7 +2,7 @@
 
 import { PricingCard } from "@/components/ui/PricingCard"
 
-export default function SyntheticV0PageForDeployment() {
+export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-4">
       <h1 className="text-4xl font-bold text-white mb-8">Welcome to EriEthio Research</h1>
