@@ -1,7 +1,8 @@
 "use client"
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 interface FlipCardProps {
   title: string;
@@ -29,15 +30,32 @@ export function FlipCard({
   onClick
 }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
       className="flip-card-container"
       initial={false}
-      animate={{ rotateY: isFlipped ? 180 : 0 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
-      onHoverStart={() => setIsFlipped(true)}
-      onHoverEnd={() => setIsFlipped(false)}
+      animate={{ 
+        rotateY: isFlipped ? 180 : 0,
+        scale: isHovered ? 1.05 : 1
+      }}
+      transition={{ 
+        duration: 0.6, 
+        ease: "easeInOut",
+        scale: {
+          duration: 0.3,
+          ease: "easeOut"
+        }
+      }}
+      onHoverStart={() => {
+        setIsHovered(true);
+        setIsFlipped(true);
+      }}
+      onHoverEnd={() => {
+        setIsHovered(false);
+        setIsFlipped(false);
+      }}
       onClick={onClick}
       style={{
         width: '300px',
@@ -74,36 +92,79 @@ export function FlipCard({
               style={{
                 background: `linear-gradient(-45deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
                 transform: 'scale(0.95)',
-                filter: isFlipped ? 'blur(50px)' : 'blur(40px)',
+                filter: isFlipped ? 'blur(50px)' : 'blur(20px)',
                 transition: 'filter 0.6s ease',
+                opacity: 0.7,
               }}
             />
 
             {/* Content */}
             <div className="relative z-10">
               {imageUrl && (
-                <div 
-                  className="w-full h-48 rounded-lg mb-4 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${imageUrl})` }}
-                />
+                <motion.div 
+                  className="w-full h-48 rounded-lg mb-4 bg-cover bg-center overflow-hidden"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div
+                    className="w-full h-full"
+                    style={{ backgroundImage: `url(${imageUrl})` }}
+                  />
+                </motion.div>
               )}
-              <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
+              <motion.h3 
+                className="text-2xl font-bold text-white mb-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {title}
+              </motion.h3>
               {subtitle && (
-                <p className="text-gray-300 mb-4">{subtitle}</p>
+                <motion.p 
+                  className="text-gray-300 mb-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {subtitle}
+                </motion.p>
               )}
               {tags && tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <motion.div 
+                  className="flex flex-wrap gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
                   {tags.map((tag, index) => (
-                    <span
+                    <motion.span
                       key={index}
-                      className="px-2 py-1 text-sm bg-neon-cyan/10 text-neon-cyan rounded-full"
+                      className="px-2 py-1 text-sm bg-black/30 border border-neon-cyan/30 text-neon-cyan rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
                     >
                       {tag}
-                    </span>
+                    </motion.span>
                   ))}
-                </div>
+                </motion.div>
               )}
             </div>
+
+            {/* Click indicator */}
+            <AnimatePresence>
+              {isHovered && onClick && (
+                <motion.div
+                  className="absolute bottom-4 right-4 flex items-center gap-2 text-neon-cyan"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                >
+                  <span className="text-sm">Learn More</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
 
@@ -133,14 +194,31 @@ export function FlipCard({
               style={{
                 background: `linear-gradient(-45deg, ${gradient.to} 0%, ${gradient.from} 100%)`,
                 transform: 'scale(0.95)',
-                filter: 'blur(40px)',
+                filter: 'blur(20px)',
+                opacity: 0.7,
               }}
             />
 
             {/* Content */}
-            <div className="relative z-10">
+            <motion.div 
+              className="relative z-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: isFlipped ? 1 : 0, y: isFlipped ? 0 : 20 }}
+              transition={{ delay: 0.3 }}
+            >
               <p className="text-white text-lg leading-relaxed">{summary}</p>
-            </div>
+              
+              {onClick && (
+                <motion.button
+                  className="mt-6 px-4 py-2 bg-white/10 border border-white/30 rounded-lg text-white text-sm flex items-center gap-2 hover:bg-white/20 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>Read More</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+              )}
+            </motion.div>
           </div>
         </motion.div>
       </div>

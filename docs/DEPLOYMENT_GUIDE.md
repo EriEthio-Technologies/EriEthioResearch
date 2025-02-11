@@ -5,9 +5,7 @@
 - npm or yarn
 - Git
 - Vercel account
-- PostgreSQL database
-- Stripe account (for payments)
-- Cloudinary account (for image uploads)
+- Supabase account
 
 ## Local Development Setup
 
@@ -27,21 +25,13 @@ yarn install
 3. Set up environment variables:
 Create a `.env.local` file with the following variables:
 ```env
-DATABASE_URL=your_postgresql_connection_string
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
-STRIPE_SECRET_KEY=your_stripe_secret_key
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-4. Run database migrations:
-```bash
-npx prisma db push
-```
-
-5. Start the development server:
+4. Start the development server:
 ```bash
 npm run dev
 # or
@@ -65,7 +55,8 @@ yarn dev
 
 3. Configure Environment Variables:
    - Add all environment variables from `.env.local` to Vercel's project settings
-   - Ensure NEXTAUTH_URL points to your production domain
+   - For production, update `NEXTAUTH_URL` to your production domain
+   - Make sure all Supabase environment variables are correctly set
 
 4. Deploy:
    - Click "Deploy"
@@ -84,6 +75,26 @@ yarn dev
    - Verify all environment variables
    - Test all functionality in production
 
+## Database Setup
+
+1. Create a new Supabase project:
+   - Go to https://supabase.com
+   - Create a new project
+   - Get your project URL and anon key
+
+2. Set up database tables:
+   - Use the SQL editor in Supabase
+   - Create necessary tables for:
+     - Users/Profiles
+     - Research Projects
+     - Publications
+     - Collaborators
+     - Activity Logs
+
+3. Configure authentication:
+   - Enable Email/Password sign-up
+   - Configure OAuth providers if needed
+
 ## Troubleshooting
 
 Common issues and solutions:
@@ -94,8 +105,8 @@ Common issues and solutions:
    - Ensure environment variables are properly set
 
 2. Database Connection Issues:
-   - Verify DATABASE_URL is correct
-   - Check if IP is whitelisted in database settings
+   - Verify Supabase URL and anon key are correct
+   - Check if IP is whitelisted in Supabase settings
    - Ensure database is accessible from deployment environment
 
 3. Authentication Problems:
@@ -133,4 +144,27 @@ Common issues and solutions:
    - Rate limiting
    - Input validation
    - CORS configuration
-   - API authentication 
+   - API authentication
+
+## Deployment Checklist
+
+Before deploying:
+- [ ] Run `npm run build` locally to verify build
+- [ ] Test all features in development
+- [ ] Check all environment variables
+- [ ] Verify database connections
+- [ ] Test authentication flows
+- [ ] Check responsive design
+- [ ] Verify API endpoints
+- [ ] Test error handling
+- [ ] Check performance metrics
+
+After deploying:
+- [ ] Verify SSL/TLS setup
+- [ ] Test all features in production
+- [ ] Monitor error logs
+- [ ] Check analytics setup
+- [ ] Verify backup systems
+- [ ] Test user flows
+- [ ] Monitor performance
+- [ ] Check security headers 
