@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  font-family: "Cyberpunk", sans-serif;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Add more custom styles as needed */
+
