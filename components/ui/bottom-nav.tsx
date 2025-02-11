@@ -4,58 +4,59 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Flask, Package } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Beaker, Package } from 'lucide-react';
 
 export function BottomNav() {
   const pathname = usePathname();
 
-  const isActive = (path: string) => {
-    return pathname === path;
-  };
-
-  const navItems = [
-    { href: '/products', label: 'Products', icon: Package },
-    { href: '/research', label: 'Research', icon: Flask },
-    { href: '/blog', label: 'Blog', icon: BookOpen },
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  const links = [
+    {
+      href: '/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      href: '/research',
+      label: 'Research',
+      icon: BookOpen,
+    },
+    {
+      href: '/products',
+      label: 'Products',
+      icon: Package,
+    },
+    {
+      href: '/blog',
+      label: 'Blog',
+      icon: Beaker,
+    },
   ];
 
   return (
-    <motion.nav
-      initial={{ y: 100 }}
-      animate={{ y: 0 }}
-      className="fixed bottom-0 left-0 z-50 w-full bg-black/80 backdrop-blur-lg border-t-2 border-neon-cyan crt-effect"
-    >
-      <div className="flex justify-around py-3 px-4 max-w-screen-xl mx-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center gap-1 transition-all duration-300",
-                isActive(item.href) 
-                  ? "text-neon-cyan" 
-                  : "text-neon-magenta hover:text-neon-cyan"
-              )}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t bg-background px-4 backdrop-blur-lg md:hidden">
+      {links.map(({ href, label, icon: Icon }) => {
+        const isActive = pathname === href;
+
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'flex flex-col items-center justify-center space-y-1',
+              isActive ? 'text-primary' : 'text-muted-foreground'
+            )}
+          >
+            <motion.div
+              initial={{ scale: 1 }}
+              animate={{ scale: isActive ? 1.2 : 1 }}
+              transition={{ duration: 0.2 }}
             >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon className="h-5 w-5" />
-              </motion.div>
-              <motion.span
-                className="text-xs font-medium"
-                whileHover={{ y: -2 }}
-              >
-                {item.label}
-              </motion.span>
-            </Link>
-          );
-        })}
-      </div>
-    </motion.nav>
+              <Icon className="h-5 w-5" />
+            </motion.div>
+            <span className="text-xs font-medium">{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 } 

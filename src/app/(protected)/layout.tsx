@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   BookOpen,
-  Flask,
+  Beaker,
   Package,
   LogOut
 } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function ProtectedLayout({
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Research Hub', href: '/research', icon: Flask },
+    { name: 'Research Hub', href: '/research', icon: Beaker },
     { name: 'Products', href: '/products', icon: Package },
     { name: 'Blog', href: '/blog', icon: BookOpen },
   ];

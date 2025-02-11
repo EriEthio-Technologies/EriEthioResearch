@@ -57,6 +57,8 @@ export interface Product {
   description: string;
   price: number | null;
   features: Record<string, any> | null;
+  images: string[];
+  specifications: Record<string, string>;
   category: string;
   status: ProductStatus;
   created_at: string;

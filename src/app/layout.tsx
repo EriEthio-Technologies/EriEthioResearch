@@ -1,29 +1,24 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import type React from "react" // Import React
-import Footer from '../components/Footer';
-import type { JSX } from 'react'
+import { Inter } from 'next/font/google';
+import { Providers } from './providers';
+import './globals.css';
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: "EriEthio Research",
-  description: "Cutting-edge AI research and solutions",
-}
+export const metadata = {
+  title: 'EriEthio Research',
+  description: 'Research and Innovation Hub',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-[#0A0A0A] text-white`}>
-        <main>{children}</main>
-        <Footer />
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }
-

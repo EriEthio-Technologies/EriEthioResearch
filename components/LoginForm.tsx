@@ -1,54 +1,44 @@
-"use client"
+interface LoginFormProps {
+  onLogin?: () => void;
+}
 
-import type React from "react"
-import { useState } from "react"
-import { OAuthButtons } from "./OAuthButtons"
-
-export const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
+export function LoginForm({ onLogin }: LoginFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log("Login:", { email, password })
-  }
+    e.preventDefault();
+    // Add your login logic here
+    onLogin?.();
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-      <div className="mb-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email
+        </label>
         <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="user@domain.com"
-          className="w-full px-3 py-2 bg-gray-800 border border-cyan-400 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-          required
+          id="email"
+          name="email"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         />
       </div>
-      <div className="mb-4">
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          Password
+        </label>
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full px-3 py-2 bg-gray-800 border border-cyan-400 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-          required
+          id="password"
+          name="password"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         />
       </div>
       <button
         type="submit"
-        className="w-full py-2 px-4 bg-gradient-to-r from-cyan-400 to-magenta-400 text-white font-bold rounded-md hover:from-cyan-500 hover:to-magenta-500 transition-colors"
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
-        Login
+        Sign in
       </button>
-      <div className="mt-4 text-center">
-        <a href="#" className="text-cyan-400 hover:text-magenta-400 transition-colors">
-          FORGOT ACCESS CODE?
-        </a>
-      </div>
-      <OAuthButtons />
     </form>
-  )
-}
-
+  );
+} 
