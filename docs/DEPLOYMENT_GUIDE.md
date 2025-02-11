@@ -38,6 +38,28 @@ npm run dev
 yarn dev
 ```
 
+## Database Setup
+
+1. Create a new Supabase project:
+   - Go to https://supabase.com
+   - Create a new project
+   - Get your project URL and anon key
+
+2. Run database migrations:
+   - Navigate to your Supabase project's SQL editor
+   - Copy the contents of `supabase/migrations/20240316000000_initial_schema.sql`
+   - Run the SQL script to create all necessary tables and policies
+
+3. Initial Data Setup:
+   - Create an admin user through the authentication UI
+   - Update the user's role to 'admin' in the profiles table
+   - Add initial product categories and tags as needed
+
+4. Verify Database Setup:
+   - Check that all tables are created correctly
+   - Verify RLS policies are in place
+   - Test user authentication flows
+
 ## Production Deployment
 
 ### Deploying to Vercel
@@ -75,44 +97,24 @@ yarn dev
    - Verify all environment variables
    - Test all functionality in production
 
-## Database Setup
-
-1. Create a new Supabase project:
-   - Go to https://supabase.com
-   - Create a new project
-   - Get your project URL and anon key
-
-2. Set up database tables:
-   - Use the SQL editor in Supabase
-   - Create necessary tables for:
-     - Users/Profiles
-     - Research Projects
-     - Publications
-     - Collaborators
-     - Activity Logs
-
-3. Configure authentication:
-   - Enable Email/Password sign-up
-   - Configure OAuth providers if needed
-
 ## Troubleshooting
 
 Common issues and solutions:
 
-1. Build Failures:
-   - Check build logs in Vercel
-   - Verify all dependencies are correctly installed
-   - Ensure environment variables are properly set
-
-2. Database Connection Issues:
+1. Database Connection Issues:
    - Verify Supabase URL and anon key are correct
    - Check if IP is whitelisted in Supabase settings
    - Ensure database is accessible from deployment environment
 
-3. Authentication Problems:
+2. Authentication Problems:
    - Verify NEXTAUTH_URL matches your domain
    - Check NEXTAUTH_SECRET is properly set
    - Ensure all OAuth providers are correctly configured
+
+3. Build Failures:
+   - Check build logs in Vercel
+   - Verify all dependencies are correctly installed
+   - Ensure environment variables are properly set
 
 ## Monitoring and Maintenance
 
