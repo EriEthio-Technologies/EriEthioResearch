@@ -5,239 +5,217 @@ This guide explains how to manage content on the EriEthio Research Website, incl
 
 ## Accessing the Admin Dashboard
 
-1. Navigate to `/admin` on your website
-2. Log in with admin credentials
-3. You'll see the main dashboard with different sections:
-   - Products
-   - Blog Posts
-   - Case Studies
-   - Users
-   - Orders
-   - Analytics
+1. Sign in with your admin account at `/auth/signin`
+2. Navigate to `/admin` to access the admin dashboard
+
+## Updating Hero Section
+
+1. Navigate to `src/components/ui/hero-section.tsx`
+2. Update the following content:
+   ```tsx
+   <motion.h1>EriEthio Research</motion.h1>
+   <motion.p>Advancing Research & Innovation</motion.p>
+   ```
+3. Customize button text and links:
+   ```tsx
+   <button>Explore Research</button>
+   <button>View Projects</button>
+   ```
+
+## Managing Feature Grid
+
+1. Open `src/components/ui/feature-grid.tsx`
+2. Edit the features array:
+   ```tsx
+   const features = [
+     {
+       icon: Beaker,
+       title: 'Research Excellence',
+       description: 'Your description here'
+     },
+     // Add more features...
+   ];
+   ```
+
+## Adding Research Projects
+
+1. Go to Admin Dashboard → Research
+2. Click "Add Project"
+3. Fill in the required fields:
+   - Title
+   - Description
+   - Methodology
+   - Lead Researcher
+   - Status
+   - Start/End Dates
+   - Tags
+4. Add collaborators (optional):
+   - Click "Collaborators" tab
+   - Add researchers with their roles
+5. Add milestones (optional):
+   - Click "Milestones" tab
+   - Set milestone titles, dates, and priorities
+6. Add publications (optional):
+   - Click "Publications" tab
+   - Link research papers and articles
 
 ## Managing Products
 
-### Adding a New Product
-
-1. Go to `/admin/products/new`
-2. Fill in the required fields:
-   - Product Name
-   - Description
-   - Price
-   - Categories
-   - Images (upload up to 5 images)
-   - Specifications
-   - Stock quantity
-
-3. Additional Options:
-   - Set featured status
-   - Add related products
-   - Configure variants
-   - Set SEO metadata
-
-### Editing Existing Products
-
-1. Navigate to `/admin/products`
-2. Click on the product you want to edit
-3. Update necessary fields
-4. Click "Save Changes"
-
-### Managing Product Categories
-
-1. Go to `/admin/categories`
-2. Add new categories with:
-   - Name
-   - Description
-   - Parent category (if applicable)
-   - Image
-
-## Blog Management
-
-### Creating a New Blog Post
-
-1. Navigate to `/admin/blog/new`
-2. Required fields:
+1. Go to Admin Dashboard → Products
+2. Click "Add Product"
+3. Fill in product details:
    - Title
-   - Content (Rich text editor)
-   - Featured Image
-   - Categories
-   - Author
-   - Publication Date
-
-3. Optional fields:
-   - Meta description
-   - Tags
-   - Excerpt
-   - Related posts
-
-### Managing Blog Categories
-
-1. Go to `/admin/blog/categories`
-2. Create or edit categories with:
-   - Name
    - Description
-   - Parent category
+   - Features (bullet points)
+   - Specifications (key-value pairs)
+   - Benefits
+   - Price (if applicable)
+   - Category
+   - Tags
+4. Add product image:
+   - Upload high-quality image (recommended: 1200x800px)
+   - Ensure image is optimized for web
 
-### Comment Moderation
+## Creating Blog Articles
 
-1. Access `/admin/blog/comments`
-2. Review pending comments
-3. Approve, reject, or mark as spam
-4. Reply to comments
+1. Go to Admin Dashboard → Blog
+2. Click "New Article"
+3. Fill in article details:
+   - Title
+   - Content (supports Markdown)
+   - Featured Image
+   - Category
+   - Tags
+4. Use the rich text editor for:
+   - Formatting text
+   - Adding images
+   - Embedding code snippets
+   - Creating lists
+5. Preview before publishing
+6. Set publication status:
+   - Draft
+   - Published
+   - Scheduled
 
-## Case Studies
+## Managing Case Studies
 
-### Creating Case Studies
-
-1. Navigate to `/admin/case-studies/new`
-2. Fill in:
-   - Project Title
+1. Go to Admin Dashboard → Case Studies
+2. Click "Add Case Study"
+3. Fill in case study details:
+   - Title
    - Client Information
    - Challenge Description
-   - Solution Details
+   - Solution
    - Results/Outcomes
-   - Images and Media
-   - Testimonials
-
-### Organizing Case Studies
-
-1. Create categories
-2. Tag by industry
-3. Set featured case studies
-4. Order by priority
-
-## User Management
-
-### Managing Users
-
-1. Go to `/admin/users`
-2. View all users
-3. Actions available:
-   - Edit user details
-   - Reset passwords
-   - Disable accounts
-   - Assign roles
-
-### User Roles
-
-Available roles:
-- Super Admin
-- Content Editor
-- Customer Service
-- Regular User
-
-### Creating Admin Users
-
-1. Navigate to `/admin/users/new`
-2. Fill required information:
-   - Name
-   - Email
-   - Role
-   - Permissions
-3. Send invitation
-
-## Media Management
-
-### Uploading Media
-
-1. Access `/admin/media`
-2. Upload options:
-   - Drag and drop
-   - Select files
-   - Bulk upload
-
-### Media Library Organization
-
-1. Create folders
-2. Add tags
-3. Search functionality
-4. Filter by type:
+   - Technologies Used
+4. Add supporting materials:
    - Images
-   - Documents
-   - Videos
+   - Charts/Graphs
+   - Testimonials
+   - Related Research
 
-## SEO Management
+## Updating Featured Content
 
-### Page SEO
+### Home Page Featured Items
 
-For each content type:
-1. Set meta title
-2. Write meta description
-3. Configure Open Graph tags
-4. Add alt text to images
+1. Open `src/app/page.tsx`
+2. Update featured research:
+   ```tsx
+   const featuredResearch = [
+     {
+       title: "Your Title",
+       subtitle: "Your Subtitle",
+       summary: "Your Summary",
+       tags: ["tag1", "tag2"],
+       gradient: { from: '#color1', to: '#color2' }
+     },
+     // Add more items...
+   ];
+   ```
+3. Similarly update `featuredCases` and `featuredBlogs`
 
-### Sitemap Management
+### Featured Cards Styling
 
-1. Auto-generated for:
-   - Products
-   - Blog posts
-   - Case studies
-   - Static pages
+1. Customize card appearance in `src/components/ui/FlipCard.tsx`
+2. Available gradient presets:
+   ```tsx
+   // Blue to Cyan
+   gradient: { from: '#1cc2ff', to: '#00ccff' }
+   
+   // Magenta to Orange
+   gradient: { from: '#ff2079', to: '#ff9d00' }
+   
+   // Purple to Pink
+   gradient: { from: '#7928ca', to: '#ff0080' }
+   ```
 
-## Analytics and Reporting
+## Adding Team Members
 
-### Viewing Analytics
+1. Go to Admin Dashboard → Users
+2. Click "Add User"
+3. Fill in user details:
+   - Full Name
+   - Email
+   - Role (researcher/admin)
+   - Bio
+   - Profile Image
+4. Send invitation
+5. User will receive email to set password
 
-1. Access `/admin/analytics`
-2. View:
-   - Page views
-   - User engagement
-   - Popular content
-   - Sales data
+## Content Guidelines
 
-### Generating Reports
+### Images
+- Use high-quality images (min 1200px width)
+- Optimize for web performance
+- Maintain 16:9 aspect ratio for featured images
+- Use PNG for graphics, JPG for photos
 
-1. Go to `/admin/reports`
-2. Available reports:
-   - Content performance
-   - User engagement
-   - Sales reports
-   - Custom reports
+### Text Content
+- Keep titles under 60 characters
+- Write clear, concise descriptions
+- Use proper headings hierarchy
+- Include relevant keywords
+- Break long content into sections
 
-## Best Practices
+### Tags and Categories
+- Use consistent naming conventions
+- Keep tags focused and relevant
+- Limit to 5-7 tags per item
+- Use existing categories when possible
 
-### Content Creation
+## SEO Best Practices
 
-1. Use clear, engaging titles
-2. Include high-quality images
-3. Maintain consistent formatting
-4. Follow brand guidelines
-5. Optimize for SEO
+1. For each content piece:
+   - Write compelling titles
+   - Add meta descriptions
+   - Use descriptive URLs
+   - Include alt text for images
+   - Structure content with proper headings
 
-### Image Guidelines
-
-1. Recommended sizes:
-   - Product images: 1200x1200px
-   - Blog featured: 1600x900px
-   - Thumbnails: 400x400px
-
-2. File formats:
-   - Use .jpg for photos
-   - Use .png for graphics
-   - Optimize file sizes
-
-### Content Organization
-
-1. Use consistent naming conventions
-2. Maintain proper categorization
-3. Regular content audits
-4. Archive outdated content
+2. Technical considerations:
+   - Optimize images
+   - Use semantic HTML
+   - Ensure mobile responsiveness
+   - Monitor loading speed
 
 ## Troubleshooting
 
 Common issues and solutions:
 
-1. Image Upload Issues:
-   - Check file size limits
-   - Verify supported formats
-   - Clear browser cache
+1. Images not displaying:
+   - Check file path
+   - Verify file format
+   - Ensure proper optimization
+   - Check Supabase storage permissions
 
-2. Editor Problems:
-   - Refresh the page
+2. Content not updating:
    - Clear browser cache
-   - Check browser compatibility
+   - Verify save operation
+   - Check database connection
+   - Review error logs
 
-3. Publishing Issues:
-   - Verify all required fields
-   - Check permissions
-   - Review scheduling settings 
+3. Formatting issues:
+   - Check Markdown syntax
+   - Verify HTML structure
+   - Review CSS classes
+   - Test responsive layouts 
