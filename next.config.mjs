@@ -15,6 +15,8 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: ['flvhpuholufzxclylrvh.supabase.co'],
+    formats: ['image/avif', 'image/webp']
   },
   experimental: {
     webpackBuildWorker: true,
