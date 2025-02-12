@@ -396,4 +396,67 @@ ANALYZE VERBOSE;
 
 -- Rebuild indexes
 REINDEX DATABASE your_database;
+```
+
+## Environment Configuration
+
+1. Create two environment files in your project root:
+   - `.env.local` for local development
+   - `.env.test` for testing
+
+2. Required environment variables:
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Database Connection
+DATABASE_URL=postgres://postgres:your_db_password@db.your_project_ref.supabase.co:5432/postgres
+POOL_DATABASE_URL=postgres://postgres.your_project_ref:your_db_password@aws-0-us-west-1.pooler.supabase.com:6543/postgres
+
+# Test User Credentials
+TEST_USER_EMAIL=test@example.com
+TEST_USER_PASSWORD=your_test_password
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_admin_password
+```
+
+3. Get these values from your Supabase dashboard:
+   - Project Settings > API > Project URL
+   - Project Settings > API > Project API keys
+   - Project Settings > Database > Connection string
+
+## Setting Up Test Users
+
+The project includes a setup script that creates test and admin users:
+
+```bash
+npm run test:e2e:setup
+```
+
+This script:
+- Creates test and admin users if they don't exist
+- Updates their profiles in the database
+- Configures proper roles and permissions
+
+## Database Policies
+
+The following policies are implemented:
+- Profiles are viewable by authenticated users
+- Users can update their own profiles
+- Users can insert their own profiles
+- Service role has full access to profiles
+
+## Migrations
+
+Database migrations are located in `supabase/migrations/` and include:
+- Initial schema setup
+- RLS policies
+- Function definitions
+- Table creation scripts
+
+To apply migrations manually:
+```bash
+supabase db reset
 ``` 

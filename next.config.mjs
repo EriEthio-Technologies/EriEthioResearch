@@ -16,7 +16,8 @@ const nextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
-  output: 'export',
+  // Use standalone output for tests, export for production
+  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
   trailingSlash: true,
 }
 
