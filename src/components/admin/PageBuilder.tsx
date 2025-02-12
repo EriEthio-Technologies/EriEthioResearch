@@ -72,6 +72,7 @@ interface PageData {
     scripts?: string[];
   };
   theme: Theme;
+  previewTheme?: Theme;
 }
 
 interface PageBuilderProps {
@@ -117,6 +118,7 @@ export default function PageBuilder({
   const [editingSection, setEditingSection] = useState<PageSection | null>(null);
   const [error, setError] = useState('');
   const router = useRouter();
+  const [previewTheme, setPreviewTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     if (selectedSection) {
@@ -127,7 +129,8 @@ export default function PageBuilder({
     }
   }, [selectedSection, pageData.sections]);
 
-  useTheme(pageData.theme);
+  const { applyTheme, removeTheme } = useTheme(pageData.theme);
+  useTheme(previewTheme || pageData.theme, Boolean(previewTheme));
 
   const handleAddSection = (type: string) => {
     const newSection: PageSection = {
@@ -226,6 +229,65 @@ export default function PageBuilder({
       settings: { ...prev.settings, ...updates }
     }));
   };
+
+  const handleThemePreview = (theme: Theme) => {
+    setPreviewTheme(theme);
+    setTimeout(() => {
+      setPreviewTheme(null);
+    }, 2000);
+  };
+
+  const renderSettingsTab = () => (
+    <div className="space-y-6 bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-neon-cyan/20">
+      <div>
+        <label className="block text-neon-magenta mb-2">Layout</label>
+        <select
+          value={pageData.settings.layout || 'default'}
+          onChange={(e) => handleUpdateSettings({ layout: e.target.value as any })}
+          className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none"
+        >
+          <option value="default">Default</option>
+          <option value="full">Full Width</option>
+          <option value="sidebar">With Sidebar</option>
+        </select>
+      </div>
+
+      <div className="space-y-4">
+        <label className="block text-neon-magenta mb-2">Theme</label>
+        <ThemePicker
+          value={pageData.theme}
+          onChange={(theme) => {
+            setPageData((prev) => ({ ...prev, theme }));
+          }}
+          onPreview={handleThemePreview}
+        />
+      </div>
+
+      <div>
+        <label className="block text-neon-magenta mb-2">Custom CSS</label>
+        <textarea
+          value={pageData.settings.customCss || ''}
+          onChange={(e) => handleUpdateSettings({ customCss: e.target.value })}
+          className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none font-mono"
+          rows={5}
+          placeholder="/* Add custom CSS here */"
+        />
+      </div>
+
+      <div>
+        <label className="block text-neon-magenta mb-2">Custom Scripts</label>
+        <textarea
+          value={pageData.settings.scripts?.join('\n') || ''}
+          onChange={(e) => handleUpdateSettings({ 
+            scripts: e.target.value.split('\n').map(s => s.trim()).filter(Boolean)
+          })}
+          className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none font-mono"
+          rows={5}
+          placeholder="// Add script URLs (one per line)"
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -422,68 +484,7 @@ export default function PageBuilder({
         )}
 
         {/* Settings Tab */}
-        {activeTab === 'settings' && (
-          <div className="space-y-6 bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-neon-cyan/20">
-            <div>
-              <label className="block text-neon-magenta mb-2">Layout</label>
-              <select
-                value={pageData.settings.layout || 'default'}
-                onChange={(e) => handleUpdateSettings({ layout: e.target.value as any })}
-                className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none"
-              >
-                <option value="default">Default</option>
-                <option value="full">Full Width</option>
-                <option value="sidebar">With Sidebar</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-neon-magenta mb-2">Theme</label>
-              <select
-                value={pageData.settings.theme || 'dark'}
-                onChange={(e) => handleUpdateSettings({ theme: e.target.value as any })}
-                className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none"
-              >
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-neon-magenta mb-2">Custom CSS</label>
-              <textarea
-                value={pageData.settings.customCss || ''}
-                onChange={(e) => handleUpdateSettings({ customCss: e.target.value })}
-                className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none font-mono"
-                rows={5}
-                placeholder="/* Add custom CSS here */"
-              />
-            </div>
-
-            <div>
-              <label className="block text-neon-magenta mb-2">Custom Scripts</label>
-              <textarea
-                value={pageData.settings.scripts?.join('\n') || ''}
-                onChange={(e) => handleUpdateSettings({ 
-                  scripts: e.target.value.split('\n').map(s => s.trim()).filter(Boolean)
-                })}
-                className="w-full px-4 py-2 bg-black/30 border border-neon-cyan/20 rounded-lg text-gray-300 focus:border-neon-cyan focus:outline-none font-mono"
-                rows={5}
-                placeholder="// Add script URLs (one per line)"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label>Theme</Label>
-                <ThemePicker
-                  value={pageData.theme}
-                  onChange={(theme) => setPageData({ ...pageData, theme })}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'settings' && renderSettingsTab()}
       </div>
 
       {/* Section Editor Sidebar */}

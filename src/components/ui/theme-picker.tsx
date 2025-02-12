@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Palette } from 'lucide-react';
+import { Check, Palette, Download, Upload } from 'lucide-react';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -118,10 +118,140 @@ const presetThemes: Theme[] = [
   },
 ];
 
+const defaultThemes: Theme[] = [
+  {
+    name: 'Neon Nights',
+    colors: {
+      primary: '#00FF9D',
+      secondary: '#FF2079',
+      accent: '#7928CA',
+      background: '#0A0A0B',
+      text: '#FFFFFF',
+      muted: '#6B7280',
+      border: '#1F2937'
+    },
+    fonts: {
+      heading: 'Inter',
+      body: 'Inter'
+    },
+    spacing: {
+      base: 4,
+      scale: 1.5
+    },
+    borderRadius: {
+      sm: '0.25rem',
+      md: '0.5rem',
+      lg: '1rem'
+    }
+  },
+  {
+    name: 'Ocean Breeze',
+    colors: {
+      primary: '#0891B2',
+      secondary: '#0EA5E9',
+      accent: '#38BDF8',
+      background: '#0F172A',
+      text: '#F8FAFC',
+      muted: '#64748B',
+      border: '#1E293B'
+    },
+    fonts: {
+      heading: 'Montserrat',
+      body: 'Inter'
+    },
+    spacing: {
+      base: 4,
+      scale: 1.5
+    },
+    borderRadius: {
+      sm: '0.375rem',
+      md: '0.75rem',
+      lg: '1.5rem'
+    }
+  },
+  {
+    name: 'Forest Dawn',
+    colors: {
+      primary: '#16A34A',
+      secondary: '#22C55E',
+      accent: '#4ADE80',
+      background: '#052E16',
+      text: '#ECFDF5',
+      muted: '#059669',
+      border: '#064E3B'
+    },
+    fonts: {
+      heading: 'Poppins',
+      body: 'Source Sans Pro'
+    },
+    spacing: {
+      base: 4,
+      scale: 1.618
+    },
+    borderRadius: {
+      sm: '0.125rem',
+      md: '0.25rem',
+      lg: '0.5rem'
+    }
+  },
+  {
+    name: 'Sunset Gradient',
+    colors: {
+      primary: '#F59E0B',
+      secondary: '#D97706',
+      accent: '#FBBF24',
+      background: '#7C2D12',
+      text: '#FEF3C7',
+      muted: '#B45309',
+      border: '#92400E'
+    },
+    fonts: {
+      heading: 'DM Sans',
+      body: 'DM Sans'
+    },
+    spacing: {
+      base: 4,
+      scale: 1.4
+    },
+    borderRadius: {
+      sm: '1rem',
+      md: '1.5rem',
+      lg: '2rem'
+    }
+  },
+  {
+    name: 'Royal Purple',
+    colors: {
+      primary: '#7C3AED',
+      secondary: '#6D28D9',
+      accent: '#8B5CF6',
+      background: '#2E1065',
+      text: '#F5F3FF',
+      muted: '#7C3AED',
+      border: '#4C1D95'
+    },
+    fonts: {
+      heading: 'Raleway',
+      body: 'Open Sans'
+    },
+    spacing: {
+      base: 4,
+      scale: 1.333
+    },
+    borderRadius: {
+      sm: '0.5rem',
+      md: '1rem',
+      lg: '9999px'
+    }
+  }
+];
+
 export function ThemePicker({ value, onChange }: ThemePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('presets');
   const [customTheme, setCustomTheme] = useState<Theme>(value);
+  const [customizing, setCustomizing] = useState(false);
+  const [previewTheme, setPreviewTheme] = useState<Theme | null>(null);
 
   const handlePresetSelect = (theme: Theme) => {
     onChange(theme);
@@ -135,6 +265,62 @@ export function ThemePicker({ value, onChange }: ThemePickerProps) {
     };
     setCustomTheme(updatedTheme);
     onChange(updatedTheme);
+  };
+
+  const handleExportTheme = () => {
+    const themeData = JSON.stringify(value, null, 2);
+    const blob = new Blob([themeData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `theme-${value.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportTheme = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedTheme = JSON.parse(e.target?.result as string);
+        // Validate imported theme structure
+        if (
+          importedTheme.name &&
+          importedTheme.colors &&
+          importedTheme.fonts &&
+          importedTheme.spacing &&
+          importedTheme.borderRadius
+        ) {
+          onChange(importedTheme);
+        } else {
+          alert('Invalid theme file format');
+        }
+      } catch (error) {
+        console.error('Error importing theme:', error);
+        alert('Error importing theme');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handlePreview = (theme: Theme) => {
+    setPreviewTheme(theme);
+    // Apply preview theme temporarily
+    Object.entries(theme.colors).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(`--preview-${key}`, value);
+    });
+    setTimeout(() => {
+      setPreviewTheme(null);
+      // Remove preview styles
+      Object.keys(theme.colors).forEach((key) => {
+        document.documentElement.style.removeProperty(`--preview-${key}`);
+      });
+    }, 2000);
   };
 
   return (

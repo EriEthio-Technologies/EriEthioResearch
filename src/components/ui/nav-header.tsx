@@ -6,12 +6,13 @@ import { Menu, X } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'Research', href: '/research' },
   { name: 'Products', href: '/products' },
+  { name: 'Research', href: '/research' },
+  { name: 'Education', href: '/education' },
   { name: 'Blog', href: '/blog' },
 ];
 
-export function NavHeader() {
+export default function NavHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -21,7 +22,7 @@ export function NavHeader() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-neon-cyan font-bold text-xl">
-              EriEthio
+              EriEthio Research
             </Link>
           </div>
 
