@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import { Providers } from './providers'
-import { NavHeader } from '@/components/ui/nav-header'
+import NavHeader from '@/components/ui/nav-header'
 import { Footer } from '@/components/ui/footer'
 import './globals.css'
 

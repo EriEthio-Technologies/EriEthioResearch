@@ -9,24 +9,34 @@ export default function ContentManagementPage() {
   const [editingContent, setEditingContent] = useState<any>(null);
   const [contentType, setContentType] = useState<'blog' | 'research' | 'case-study'>('blog');
 
-  const handleSave = async (data: any) => {
-    // Handle saving content
+  const handleSave = () => {
     setShowEditor(false);
     setEditingContent(null);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      <ContentManager />
-      
-      {showEditor && (
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black p-8">
+      {showEditor ? (
         <ContentEditor
+          id={editingContent?.id}
           type={contentType}
           initialData={editingContent}
           onSave={handleSave}
           onCancel={() => {
             setShowEditor(false);
             setEditingContent(null);
+          }}
+        />
+      ) : (
+        <ContentManager
+          onEdit={(content) => {
+            setEditingContent(content);
+            setContentType(content.type);
+            setShowEditor(true);
+          }}
+          onNew={(type) => {
+            setContentType(type);
+            setShowEditor(true);
           }}
         />
       )}

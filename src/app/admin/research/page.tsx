@@ -16,7 +16,8 @@ import {
   BarChart,
   Clock,
   Users,
-  Archive
+  Archive,
+  Check
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ProjectStatus } from '@/lib/db/types';

@@ -46,50 +46,51 @@ export default function ResearchCategoryClient() {
 
   useEffect(() => {
     async function fetchData() {
-      if (session?.user) {
-        try {
-          if (!can(session, 'read', 'research')) {
-            router.push('/dashboard');
+      try {
+        let table;
+        switch (category) {
+          case 'active-projects':
+            table = 'research_projects';
+            break;
+          case 'publications':
+            table = 'publications';
+            break;
+          case 'collaborations':
+            table = 'collaborations';
+            break;
+          default:
+            router.push('/research');
             return;
-          }
-
-          let table;
-          switch (category) {
-            case 'active-projects':
-              table = 'research_projects';
-              break;
-            case 'publications':
-              table = 'publications';
-              break;
-            case 'collaborations':
-              table = 'collaborations';
-              break;
-            default:
-              router.push('/research');
-              return;
-          }
-
-          const { data, error } = await supabase
-            .from(table)
-            .select('*, author:profiles(*)')
-            .order('created_at', { ascending: false });
-
-          if (error) throw error;
-
-          if (data) {
-            setItems(data.map(item => ({
-              ...item,
-              author: {
-                name: item.author.full_name,
-                role: item.author.role,
-              }
-            })));
-          }
-        } catch (error) {
-          console.error('Error fetching research data:', error);
-        } finally {
-          setLoading(false);
         }
+
+        const query = supabase
+          .from(table)
+          .select('*, author:profiles(full_name, role)')
+          .order('created_at', { ascending: false });
+
+        if (!session?.user) {
+          query.eq('is_public', true);
+        } else if (!can(session, 'read', 'research')) {
+          query.eq('is_public', true);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (data) {
+          setItems(data.map(item => ({
+            ...item,
+            author: {
+              name: item.author.full_name,
+              role: item.author.role,
+            }
+          })));
+        }
+      } catch (error) {
+        console.error('Error fetching research data:', error);
+      } finally {
+        setLoading(false);
       }
     }
 
