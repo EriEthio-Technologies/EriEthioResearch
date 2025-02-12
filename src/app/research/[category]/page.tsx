@@ -26,6 +26,14 @@ interface ResearchItem {
   tags: string[];
 }
 
+export async function generateStaticParams() {
+  return [
+    { category: 'active-projects' },
+    { category: 'publications' },
+    { category: 'collaborations' }
+  ];
+}
+
 export default function ResearchCategoryPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
