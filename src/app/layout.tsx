@@ -29,15 +29,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <div className="flex flex-col min-h-screen">
-            <NavHeader />
-            <main className="flex-grow pt-16">
+        <div className="flex flex-col min-h-screen">
+          <NavHeader />
+          <main className="flex-grow pt-16">
+            <Providers>
               {children}
-            </main>
-            <Footer />
-          </div>
-        </Providers>
+            </Providers>
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   )
