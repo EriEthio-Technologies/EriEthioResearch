@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { Metadata } from 'next';
 
 interface BlogPost {
   id: string;
@@ -16,11 +15,6 @@ interface BlogPost {
   tags: string[];
   slug: string;
 }
-
-export const metadata: Metadata = {
-  title: 'Blog | EriEthio Research',
-  description: 'Latest research insights and updates from EriEthio Research.'
-};
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
