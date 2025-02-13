@@ -1,13 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import { FileText, Plus, Trash2, Link2, BookOpen, Calendar, Tag, RefreshCw } from 'lucide-react';
 import BulkActionsMenu from './BulkActionsMenu';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 interface Publication {
   id: string;
