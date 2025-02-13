@@ -2,23 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserRole } from '@/lib/db/types';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-interface User {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: UserRole;
-  created_at: string;
-}
+import { supabaseAdmin } from '@/lib/supabase';
 
 const container = {
   hidden: { opacity: 0 },
@@ -49,7 +36,7 @@ export default function UsersManagement() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
           .from('profiles')
           .select('*')
           .order('created_at', { ascending: false });
@@ -72,7 +59,7 @@ export default function UsersManagement() {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('profiles')
         .delete()
         .eq('id', id);
@@ -80,13 +67,13 @@ export default function UsersManagement() {
       if (error) throw error;
 
       // Delete auth user
-      const { error: authError } = await supabase.auth.admin.deleteUser(id);
+      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
       if (authError) throw authError;
 
       setUsers(users.filter(user => user.id !== id));
 
       // Log activity
-      await supabase.from('admin_activity').insert({
+      await supabaseAdmin.from('admin_activity').insert({
         type: 'user_deleted',
         description: `User ${email} was deleted`,
       });
@@ -97,7 +84,7 @@ export default function UsersManagement() {
 
   async function handleUpdateRole(id: string, newRole: UserRole, email: string) {
     try {
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('profiles')
         .update({ role: newRole })
         .eq('id', id);
@@ -109,7 +96,7 @@ export default function UsersManagement() {
       ));
 
       // Log activity
-      await supabase.from('admin_activity').insert({
+      await supabaseAdmin.from('admin_activity').insert({
         type: 'user_role_updated',
         description: `User ${email}'s role was updated to ${newRole}`,
       });
