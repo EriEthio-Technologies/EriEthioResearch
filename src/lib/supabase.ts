@@ -8,14 +8,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a single instance of the Supabase client
-const globalForSupabase = globalThis as unknown as {
-  supabase: ReturnType<typeof createClient> | undefined;
-  supabaseAdmin: ReturnType<typeof createClient> | undefined;
-};
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+let supabaseAdminInstance: ReturnType<typeof createClient> | null = null;
 
-export const supabase =
-  globalForSupabase.supabase ??
-  createClient(supabaseUrl, supabaseAnonKey, {
+export function getSupabase() {
+  if (supabaseInstance) return supabaseInstance;
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -24,13 +23,12 @@ export const supabase =
     },
   });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForSupabase.supabase = supabase;
+  return supabaseInstance;
 }
 
 // For admin operations (server-side only)
 export function getSupabaseAdmin() {
-  if (globalForSupabase.supabaseAdmin) return globalForSupabase.supabaseAdmin;
+  if (supabaseAdminInstance) return supabaseAdminInstance;
 
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -38,16 +36,15 @@ export function getSupabaseAdmin() {
     throw new Error('Missing Supabase service role key');
   }
 
-  const admin = createClient(supabaseUrl, supabaseServiceKey, {
+  supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
   });
 
-  if (process.env.NODE_ENV !== 'production') {
-    globalForSupabase.supabaseAdmin = admin;
-  }
+  return supabaseAdminInstance;
+}
 
-  return admin;
-} 
+// Export a singleton instance for general use
+export const supabase = getSupabase(); 

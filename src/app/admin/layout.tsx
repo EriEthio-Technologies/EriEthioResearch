@@ -11,42 +11,42 @@ import {
   BarChart, 
   Settings,
   Menu,
-  X
+  X,
+  Home
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { can } from '@/lib/rbac';
 
 const sidebarItems = [
+  { 
+    title: 'Overview', 
+    icon: Home, 
+    href: '/admin',
+  },
   { 
     title: 'Products', 
     icon: Package, 
     href: '/admin/products',
-    permission: { action: 'manage', subject: 'products' }
   },
   { 
     title: 'Research', 
     icon: BookOpen, 
     href: '/admin/research',
-    permission: { action: 'manage', subject: 'research' }
   },
   { 
     title: 'Users', 
     icon: Users, 
     href: '/admin/users',
-    permission: { action: 'manage', subject: 'users' }
   },
   { 
     title: 'Analytics', 
     icon: BarChart, 
     href: '/admin/analytics',
-    permission: { action: 'read', subject: 'analytics' }
   },
   { 
     title: 'Settings', 
     icon: Settings, 
     href: '/admin/settings',
-    permission: { action: 'manage', subject: 'settings' }
   },
 ];
 
@@ -62,7 +62,7 @@ export default function AdminLayout({
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin');
-    } else if (session?.user && session.user.role !== 'admin') {
+    } else if (status === 'authenticated' && session?.user?.role !== 'admin') {
       router.push('/dashboard');
     }
   }, [status, session, router]);
@@ -75,15 +75,15 @@ export default function AdminLayout({
     );
   }
 
-  if (!session || session.user.role !== 'admin') {
+  if (status !== 'authenticated' || !session?.user?.role || session.user.role !== 'admin') {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 pt-16">
       {/* Mobile menu button */}
       <button
-        className="fixed top-4 left-4 z-50 lg:hidden text-neon-cyan hover:text-neon-cyan/80 transition-colors"
+        className="fixed top-20 left-4 z-50 lg:hidden text-neon-cyan hover:text-neon-cyan/80 transition-colors"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         {isSidebarOpen ? (
@@ -95,7 +95,7 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <motion.div
-        className={`fixed top-0 left-0 h-full bg-black/30 backdrop-blur-sm border-r border-neon-cyan/20 w-64 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-black/30 backdrop-blur-sm border-r border-neon-cyan/20 w-64 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
         initial={{ x: -100 }}
@@ -107,9 +107,6 @@ export default function AdminLayout({
           <nav className="space-y-2">
             {sidebarItems.map((item) => {
               const Icon = item.icon;
-              if (!can(session, item.permission.action, item.permission.subject)) {
-                return null;
-              }
               return (
                 <Link
                   key={item.href}
