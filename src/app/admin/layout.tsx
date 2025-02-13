@@ -75,7 +75,7 @@ export default function AdminLayout({
     );
   }
 
-  if (!session) {
+  if (!session || session.user.role !== 'admin') {
     return null;
   }
 
