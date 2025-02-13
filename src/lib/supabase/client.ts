@@ -11,28 +11,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a single instance of the Supabase client for client-side use
-class ClientSupabase {
-  private static instance: ReturnType<typeof createClient> | null = null;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'supabase.auth.token',
+  },
+});
 
-  private constructor() {}
-
-  public static getInstance() {
-    if (!this.instance) {
-      this.instance = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-          storageKey: 'supabase.auth.token',
-        },
-      });
-    }
-    return this.instance;
-  }
-}
-
-// Export a function to get the client instance
-export const createClient = () => ClientSupabase.getInstance();
-
-// For direct usage when you don't need to call createClient()
-export const supabase = ClientSupabase.getInstance(); 
+// Export the client instance directly
+export default supabase; 
