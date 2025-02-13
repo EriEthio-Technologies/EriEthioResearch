@@ -4,130 +4,215 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight, BookOpen, Users, BarChart, Sparkles } from 'lucide-react';
+
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
 
 export default function HomePage() {
   const { data: session } = useSession();
-  const [pageData, setPageData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    researchers: 0,
+    publications: 0,
+    projects: 0,
+    collaborations: 0
+  });
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchStats() {
       try {
-        const { data, error } = await supabase
-          .from('pages')
-          .select('*')
-          .eq('slug', 'home')
-          .single();
+        const [researchers, publications, projects] = await Promise.all([
+          supabase.from('profiles').select('*', { count: 'exact' }),
+          supabase.from('publications').select('*', { count: 'exact' }),
+          supabase.from('research_projects').select('*', { count: 'exact' })
+        ]);
 
-        if (error) throw error;
-        setPageData(data);
+        setStats({
+          researchers: researchers.count || 0,
+          publications: publications.count || 0,
+          projects: projects.count || 0,
+          collaborations: Math.floor((projects.count || 0) * 1.5) // Example calculation
+        });
       } catch (error) {
-        console.error('Error fetching page data:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching stats:', error);
       }
     }
 
-    fetchData();
+    fetchStats();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="text-neon-cyan text-xl">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* Hero Section */}
-      <div className="pt-24 pb-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-neon-cyan mb-6">
-              Welcome to EriEthio Research
-            </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Discover groundbreaking research and collaboration opportunities between Eritrea and Ethiopia.
-              Join our community of researchers, innovators, and thought leaders.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Link
-                href="/research"
-                className="bg-neon-cyan/20 text-neon-cyan border border-neon-cyan hover:bg-neon-cyan hover:text-black px-6 py-3 rounded-lg transition-all"
-              >
+      <motion.section 
+        className="pt-32 pb-16 px-4 relative overflow-hidden"
+        initial="initial"
+        animate="animate"
+        variants={staggerContainer}
+      >
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.h1 
+            className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-magenta to-neon-cyan mb-6"
+            variants={fadeIn}
+          >
+            EriEthio Research
+          </motion.h1>
+          <motion.p 
+            className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl"
+            variants={fadeIn}
+          >
+            Pioneering research collaboration between Eritrea and Ethiopia. 
+            Join our community of innovators shaping the future.
+          </motion.p>
+          <motion.div 
+            className="flex flex-wrap gap-4"
+            variants={fadeIn}
+          >
+            <Link
+              href="/research"
+              className="group relative px-8 py-4 bg-neon-cyan/20 rounded-lg overflow-hidden transition-all hover:bg-neon-cyan/30"
+            >
+              <span className="relative z-10 flex items-center gap-2 text-neon-cyan group-hover:text-white transition-colors">
                 Explore Research
-              </Link>
-              <Link
-                href="/auth/signin"
-                className="bg-neon-magenta/20 text-neon-magenta border border-neon-magenta hover:bg-neon-magenta hover:text-black px-6 py-3 rounded-lg transition-all"
-              >
-                Join Now
-              </Link>
-            </div>
-          </div>
+                <ArrowRight className="w-5 h-5" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-magenta opacity-0 group-hover:opacity-20 transition-opacity" />
+            </Link>
+            <Link
+              href="/publications"
+              className="group relative px-8 py-4 bg-neon-magenta/20 rounded-lg overflow-hidden transition-all hover:bg-neon-magenta/30"
+            >
+              <span className="relative z-10 flex items-center gap-2 text-neon-magenta group-hover:text-white transition-colors">
+                View Publications
+                <ArrowRight className="w-5 h-5" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-magenta to-neon-cyan opacity-0 group-hover:opacity-20 transition-opacity" />
+            </Link>
+          </motion.div>
         </div>
-      </div>
 
-      {/* Featured Sections */}
-      <div className="py-16 px-4">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.1)_0%,transparent_70%)]" />
+          <div className="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,0,255,0.1)_0%,transparent_70%)] animate-pulse" />
+        </div>
+      </motion.section>
+
+      {/* Stats Section */}
+      <motion.section 
+        className="py-16 px-4"
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        variants={staggerContainer}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Research Projects */}
-            <div className="bg-black/30 backdrop-blur-sm border border-neon-cyan/20 p-6 rounded-lg">
-              <h2 className="text-2xl font-semibold text-neon-cyan mb-4">Research Projects</h2>
-              <p className="text-gray-300 mb-4">
-                Explore ongoing research projects and find opportunities for collaboration across various disciplines.
-              </p>
-              <Link
-                href="/research"
-                className="text-neon-cyan hover:text-neon-cyan/80 transition-colors"
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            variants={staggerContainer}
+          >
+            {[
+              { label: 'Researchers', value: stats.researchers, icon: Users, color: 'neon-cyan' },
+              { label: 'Publications', value: stats.publications, icon: BookOpen, color: 'neon-magenta' },
+              { label: 'Projects', value: stats.projects, icon: BarChart, color: 'neon-cyan' },
+              { label: 'Collaborations', value: stats.collaborations, icon: Sparkles, color: 'neon-magenta' }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                className="group relative bg-black/30 backdrop-blur-sm border border-gray-800 rounded-lg p-6 hover:border-current transition-colors duration-300"
+                variants={fadeIn}
               >
-                View Projects →
-              </Link>
-            </div>
-
-            {/* Publications */}
-            <div className="bg-black/30 backdrop-blur-sm border border-neon-magenta/20 p-6 rounded-lg">
-              <h2 className="text-2xl font-semibold text-neon-magenta mb-4">Publications</h2>
-              <p className="text-gray-300 mb-4">
-                Access the latest publications, research findings, and academic papers from our community.
-              </p>
-              <Link
-                href="/publications"
-                className="text-neon-magenta hover:text-neon-magenta/80 transition-colors"
-              >
-                Browse Publications →
-              </Link>
-            </div>
-
-            {/* Collaboration */}
-            <div className="bg-black/30 backdrop-blur-sm border border-neon-cyan/20 p-6 rounded-lg">
-              <h2 className="text-2xl font-semibold text-neon-cyan mb-4">Collaboration</h2>
-              <p className="text-gray-300 mb-4">
-                Connect with researchers, institutions, and industry partners to drive innovation forward.
-              </p>
-              <Link
-                href="/contact"
-                className="text-neon-cyan hover:text-neon-cyan/80 transition-colors"
-              >
-                Get Started →
-              </Link>
-            </div>
-          </div>
+                <div className={`text-${stat.color}`}>
+                  <stat.icon className="w-8 h-8 mb-4" />
+                  <h3 className="text-4xl font-bold mb-2">{stat.value}</h3>
+                  <p className="text-gray-400">{stat.label}</p>
+                </div>
+                <div className={`absolute inset-0 bg-gradient-to-r from-${stat.color}/0 to-${stat.color}/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg`} />
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </div>
+      </motion.section>
 
-      {/* Latest Research Section */}
-      <div className="py-16 px-4 bg-black/30">
+      {/* Featured Research Section */}
+      <motion.section 
+        className="py-16 px-4 relative"
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        variants={staggerContainer}
+      >
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-neon-magenta mb-8">Latest Research</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Add research cards here */}
-          </div>
+          <motion.h2 
+            className="text-3xl font-bold text-neon-cyan mb-8"
+            variants={fadeIn}
+          >
+            Featured Research
+          </motion.h2>
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+          >
+            {[1, 2, 3].map((_, index) => (
+              <motion.div
+                key={index}
+                className="group bg-black/30 backdrop-blur-sm border border-gray-800 rounded-lg p-6 hover:border-neon-cyan transition-colors duration-300"
+                variants={fadeIn}
+              >
+                <div className="h-40 bg-gradient-to-br from-neon-cyan/20 to-neon-magenta/20 rounded-lg mb-4" />
+                <h3 className="text-xl font-semibold text-neon-magenta mb-2">Research Project {index + 1}</h3>
+                <p className="text-gray-400 mb-4">
+                  Innovative research project exploring new frontiers in technology and science.
+                </p>
+                <Link
+                  href="/research"
+                  className="inline-flex items-center text-neon-cyan hover:text-neon-cyan/80 transition-colors"
+                >
+                  Learn More
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </div>
+      </motion.section>
+
+      {/* Call to Action */}
+      <motion.section 
+        className="py-16 px-4"
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-magenta mb-6">
+            Ready to Join Our Research Community?
+          </h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Connect with researchers, access resources, and contribute to groundbreaking research.
+          </p>
+          <Link
+            href="/auth/signin"
+            className="inline-flex items-center px-8 py-4 bg-neon-cyan/20 text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-black transition-all duration-300"
+          >
+            Get Started
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Link>
+        </div>
+      </motion.section>
     </div>
   );
 }

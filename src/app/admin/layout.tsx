@@ -1,133 +1,82 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Package, 
-  BookOpen, 
-  Users, 
-  BarChart, 
-  Settings,
-  Menu,
-  X,
-  Home
-} from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Sidebar } from '@/components/admin/Sidebar';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
-const sidebarItems = [
-  { 
-    title: 'Overview', 
-    icon: Home, 
-    href: '/admin',
-  },
-  { 
-    title: 'Products', 
-    icon: Package, 
-    href: '/admin/products',
-  },
-  { 
-    title: 'Research', 
-    icon: BookOpen, 
-    href: '/admin/research',
-  },
-  { 
-    title: 'Users', 
-    icon: Users, 
-    href: '/admin/users',
-  },
-  { 
-    title: 'Analytics', 
-    icon: BarChart, 
-    href: '/admin/analytics',
-  },
-  { 
-    title: 'Settings', 
-    icon: Settings, 
-    href: '/admin/settings',
-  },
-];
-
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { data: session, status } = useSession();
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    } else if (status === 'authenticated' && session?.user?.role !== 'admin') {
-      router.push('/dashboard');
-    }
-  }, [status, session, router]);
+    const checkAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          router.push('/auth/login');
+          return;
+        }
 
-  if (status === 'loading') {
+        if (!session) {
+          router.push('/auth/login');
+          return;
+        }
+
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Profile error:', profileError);
+          router.push('/auth/login');
+          return;
+        }
+
+        const hasAdminRole = userProfile?.role === 'admin';
+        setIsAdmin(hasAdminRole);
+        setIsAuthenticated(true);
+
+        if (!hasAdminRole) {
+          router.push('/');
+          return;
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.push('/auth/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="text-neon-cyan text-xl">Loading...</div>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (status !== 'authenticated' || !session?.user?.role || session.user.role !== 'admin') {
+  if (!isAuthenticated || !isAdmin) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 pt-16">
-      {/* Mobile menu button */}
-      <button
-        className="fixed top-20 left-4 z-50 lg:hidden text-neon-cyan hover:text-neon-cyan/80 transition-colors"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        {isSidebarOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <Menu className="w-6 h-6" />
-        )}
-      </button>
-
-      {/* Sidebar */}
-      <motion.div
-        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-black/30 backdrop-blur-sm border-r border-neon-cyan/20 w-64 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-        initial={{ x: -100 }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-neon-cyan mb-8">Admin Panel</h1>
-          <nav className="space-y-2">
-            {sidebarItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center space-x-3 text-gray-300 hover:text-neon-magenta hover:bg-black/20 rounded-lg p-3 transition-colors"
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.title}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </motion.div>
-
-      {/* Main content */}
-      <div className={`transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : ''}`}>
-        <main className="p-8">
-          {children}
-        </main>
-      </div>
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto p-8">
+        {children}
+      </main>
     </div>
   );
 } 

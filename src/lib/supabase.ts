@@ -8,43 +8,44 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a single instance of the Supabase client
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
-let supabaseAdminInstance: ReturnType<typeof createClient> | null = null;
+class SupabaseClient {
+  private static instance: ReturnType<typeof createClient> | null = null;
+  private static adminInstance: ReturnType<typeof createClient> | null = null;
 
-export function getSupabase() {
-  if (supabaseInstance) return supabaseInstance;
+  private constructor() {}
 
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storageKey: 'supabase.auth.token',
-    },
-  });
-
-  return supabaseInstance;
-}
-
-// For admin operations (server-side only)
-export function getSupabaseAdmin() {
-  if (supabaseAdminInstance) return supabaseAdminInstance;
-
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseServiceKey) {
-    throw new Error('Missing Supabase service role key');
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storageKey: 'supabase.auth.token',
+        },
+      });
+    }
+    return this.instance;
   }
 
-  supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  public static getAdminInstance() {
+    if (!this.adminInstance) {
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!supabaseServiceKey) {
+        throw new Error('Missing Supabase service role key');
+      }
 
-  return supabaseAdminInstance;
+      this.adminInstance = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      });
+    }
+    return this.adminInstance;
+  }
 }
 
-// Export a singleton instance for general use
-export const supabase = getSupabase(); 
+// Export singleton instances
+export const supabase = SupabaseClient.getInstance();
+export const supabaseAdmin = SupabaseClient.getAdminInstance(); 
