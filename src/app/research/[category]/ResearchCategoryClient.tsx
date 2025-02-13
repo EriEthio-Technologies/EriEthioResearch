@@ -4,14 +4,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import { can } from '@/lib/rbac';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 interface ResearchItem {
   id: string;

@@ -3,14 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft } from 'lucide-react';
 import ProductForm from '@/components/ProductForm';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 export default function NewProduct() {
   const [isLoading, setIsLoading] = useState(false);

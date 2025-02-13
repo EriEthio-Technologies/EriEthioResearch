@@ -157,6 +157,49 @@ CREATE POLICY "Only admins can insert/update/delete products"
         )
     );
 
+-- Admin activity policies
+CREATE POLICY "Only admins can view admin activity"
+    ON admin_activity FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM profiles
+            WHERE id = auth.uid()
+            AND role = 'admin'
+        )
+    );
+
+CREATE POLICY "Only admins can insert admin activity"
+    ON admin_activity FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM profiles
+            WHERE id = auth.uid()
+            AND role = 'admin'
+        )
+    );
+
+-- Admin settings policies
+CREATE POLICY "Only admins can manage settings"
+    ON settings FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM profiles
+            WHERE id = auth.uid()
+            AND role = 'admin'
+        )
+    );
+
+-- Admin analytics policies
+CREATE POLICY "Only admins can access full analytics"
+    ON analytics FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM profiles
+            WHERE id = auth.uid()
+            AND role = 'admin'
+        )
+    );
+
 -- Create functions and triggers
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$

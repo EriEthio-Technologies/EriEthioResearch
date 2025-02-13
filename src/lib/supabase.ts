@@ -30,22 +30,28 @@ class SupabaseClient {
   }
 
   public static getAdminInstance() {
-    if (!this.adminInstance) {
-      if (!supabaseServiceKey) {
-        throw new Error('Missing Supabase service role key');
-      }
+    // Only create admin instance on the server side
+    if (typeof window === 'undefined') {
+      if (!this.adminInstance) {
+        if (!supabaseServiceKey) {
+          throw new Error('Missing Supabase service role key');
+        }
 
-      this.adminInstance = createClient(supabaseUrl, supabaseServiceKey, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      });
+        this.adminInstance = createClient(supabaseUrl, supabaseServiceKey, {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+          },
+        });
+      }
+      return this.adminInstance;
     }
-    return this.adminInstance;
+    throw new Error('Admin client can only be used on the server side');
   }
 }
 
 // Export singleton instances
 export const supabase = SupabaseClient.getInstance();
-export const supabaseAdmin = SupabaseClient.getAdminInstance(); 
+export const supabaseAdmin = process.env.NODE_ENV === 'development' && typeof window === 'undefined' 
+  ? SupabaseClient.getAdminInstance() 
+  : null; 

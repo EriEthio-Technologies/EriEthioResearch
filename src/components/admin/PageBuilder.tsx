@@ -31,11 +31,7 @@ import { iconMap } from '@/lib/icons';
 import { SectionEditor } from '@/components/admin/SectionEditor';
 import { ThemePicker } from '@/components/ui/theme-picker';
 import { useTheme } from '@/hooks/useTheme';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 interface PageSection {
   id: string;

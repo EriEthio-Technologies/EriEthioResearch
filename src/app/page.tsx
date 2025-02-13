@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, BookOpen, Users, BarChart, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { FlipCard } from '@/components/ui/FlipCard';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -29,6 +31,7 @@ export default function HomePage() {
     projects: 0,
     collaborations: 0
   });
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchStats() {
@@ -159,32 +162,45 @@ export default function HomePage() {
             className="text-3xl font-bold text-neon-cyan mb-8"
             variants={fadeIn}
           >
-            Featured Research
+            Research Highlights
           </motion.h2>
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center"
             variants={staggerContainer}
           >
-            {[1, 2, 3].map((_, index) => (
-              <motion.div
-                key={index}
-                className="group bg-black/30 backdrop-blur-sm border border-gray-800 rounded-lg p-6 hover:border-neon-cyan transition-colors duration-300"
-                variants={fadeIn}
-              >
-                <div className="h-40 bg-gradient-to-br from-neon-cyan/20 to-neon-magenta/20 rounded-lg mb-4" />
-                <h3 className="text-xl font-semibold text-neon-magenta mb-2">Research Project {index + 1}</h3>
-                <p className="text-gray-400 mb-4">
-                  Innovative research project exploring new frontiers in technology and science.
-                </p>
-                <Link
-                  href="/research"
-                  className="inline-flex items-center text-neon-cyan hover:text-neon-cyan/80 transition-colors"
-                >
-                  Learn More
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </motion.div>
-            ))}
+            <FlipCard
+              title="AI Ethics Research"
+              subtitle="Ethical AI Development"
+              summary="Exploring the ethical implications of AI in healthcare, finance, and social systems. Our research focuses on developing frameworks for responsible AI deployment."
+              tags={['Ethics', 'AI', 'Healthcare']}
+              gradient={{
+                from: '#00ffff',
+                to: '#ff00ff'
+              }}
+              onClick={() => router.push('/research/ai-ethics')}
+            />
+            <FlipCard
+              title="Cross-Border Innovation"
+              subtitle="Collaborative Research"
+              summary="Fostering innovation through cross-border collaboration between Eritrean and Ethiopian researchers, focusing on sustainable development solutions."
+              tags={['Innovation', 'Collaboration', 'Development']}
+              gradient={{
+                from: '#ff00ff',
+                to: '#00ffff'
+              }}
+              onClick={() => router.push('/research/innovation')}
+            />
+            <FlipCard
+              title="Technology Impact"
+              subtitle="Social Impact Analysis"
+              summary="Analyzing the societal impact of emerging technologies in East Africa, with a focus on digital transformation and economic development."
+              tags={['Technology', 'Society', 'Development']}
+              gradient={{
+                from: '#00ffff',
+                to: '#ff1493'
+              }}
+              onClick={() => router.push('/research/tech-impact')}
+            />
           </motion.div>
         </div>
       </motion.section>

@@ -6,11 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Plus, Edit, Trash2, Eye, Lock, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PageBuilder from '@/components/admin/PageBuilder';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 interface Page {
   id: string;

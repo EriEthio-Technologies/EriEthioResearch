@@ -3,33 +3,31 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
 import { nanoid } from 'nanoid';
+import { getToken } from 'next-auth/jwt';
 
 export default withAuth(
   function middleware(req) {
-    // Add custom middleware logic here if needed
+    const token = req.nextauth.token;
+    const isAdmin = token?.role === 'admin';
+    const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+
+    // Redirect non-admin users trying to access admin routes
+    if (isAdminRoute && !isAdmin) {
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: '/auth/signin',
+      authorized: ({ token }) => !!token
     },
   }
 );
 
 // Combined config for both auth and analytics
 export const config = {
-  matcher: [
-    // Auth protected routes
-    '/dashboard/:path*',
-    '/research/:path*',
-    '/products/:path*',
-    '/api/protected/:path*',
-    // Analytics tracking (exclude static files)
-    '/((?!_next/static|_next/image|favicon.ico).*)'
-  ]
+  matcher: ['/admin/:path*', '/api/admin/:path*']
 };
 
 export async function middleware(request: NextRequest) {

@@ -3,14 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft } from 'lucide-react';
 import ResearchProjectForm from '@/components/ResearchProjectForm';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase/client';
 
 export default function NewResearchProject() {
   const [isLoading, setIsLoading] = useState(false);

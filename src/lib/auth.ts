@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
   interface Session {
@@ -31,8 +30,8 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
 }
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export const authOptions: NextAuthOptions = {
@@ -45,39 +44,41 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error('Missing credentials');
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: credentials.email,
-          password: credentials.password,
-        });
+        try {
+          const { data: { user }, error } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
 
-        if (error) {
-          throw new Error(error.message);
+          if (error) throw error;
+
+          if (!user) {
+            throw new Error('Invalid credentials');
+          }
+
+          // Get user profile with role
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email,
+            role: profile?.role || 'user'
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          throw new Error('Authentication failed');
         }
-
-        // Fetch user profile with role
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
-        return {
-          id: data.user.id,
-          email: data.user.email,
-          name: profile?.full_name || data.user.email,
-          role: profile?.role || 'user',
-        };
-      },
-    }),
+      }
+    })
   ],
-  pages: {
-    signIn: '/auth/signin',
-    signOut: '/auth/signout',
-    error: '/auth/error',
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -87,16 +88,22 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
+      if (session?.user) {
         session.user.id = token.id;
         session.user.role = token.role;
       }
       return session;
-    },
+    }
+  },
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
   },
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 };
 
