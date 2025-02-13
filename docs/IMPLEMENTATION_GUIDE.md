@@ -40,7 +40,7 @@ This guide provides step-by-step instructions for implementing and deploying the
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-org/your-repo.git
+git clone https://github.com/EriEthio-Technologies/EriEthioResearch
 cd your-repo
 ```
 

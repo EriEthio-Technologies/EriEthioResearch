@@ -3,12 +3,22 @@ import { Providers } from './providers'
 import NavHeader from '@/components/ui/nav-header'
 import { Footer } from '@/components/ui/footer'
 import './globals.css'
+import { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'EriEthio Research',
-  description: 'Research and Innovation Hub',
+  description: 'Research and Innovation Platform',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', type: 'image/png' },
+    ],
+  },
 }
 
 export default function RootLayout({
