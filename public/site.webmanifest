@@ -1,0 +1,9 @@
+{
+  "name": "EriEthio Research",
+  "short_name": "EriEthio",
+  "description": "Research and Innovation Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+} 

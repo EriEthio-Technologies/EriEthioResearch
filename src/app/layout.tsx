@@ -1,24 +1,19 @@
-import { Inter } from 'next/font/google'
-import { Providers } from './providers'
-import NavHeader from '@/components/ui/nav-header'
-import { Footer } from '@/components/ui/footer'
-import './globals.css'
 import { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import Providers from '@/components/Providers'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'EriEthio Research',
-  description: 'Research and Innovation Platform',
+  description: 'A platform for research collaboration between Eritrea and Ethiopia',
   icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/icon.png', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-icon.png', type: 'image/png' },
-    ],
+    icon: '/favicon.ico'
   },
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({
@@ -29,15 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          <NavHeader />
-          <main className="flex-grow pt-16">
-            <Providers>
-              {children}
-            </Providers>
-          </main>
-          <Footer />
-        </div>
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   )
