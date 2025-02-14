@@ -1,23 +1,22 @@
-export async function POST(req: Request) {
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
   try {
-    const data = await req.json();
+    const data = await request.json();
     
-    // Add proper CORS headers
+    // Add CORS headers
     const headers = new Headers({
-      'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
 
-    // Process analytics data
-    return new Response(JSON.stringify({ status: 'ok' }), { 
+    return new NextResponse(JSON.stringify({ status: 'ok' }), {
       status: 200,
       headers
     });
-    
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Invalid request' }), { 
+    return new NextResponse(JSON.stringify({ error: 'Invalid request' }), {
       status: 400,
       headers: {
         'Content-Type': 'application/json',
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
 
 // Add OPTIONS handler for CORS preflight
 export async function OPTIONS() {
-  return new Response(null, {
+  return new NextResponse(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
