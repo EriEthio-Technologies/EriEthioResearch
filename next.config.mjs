@@ -21,6 +21,16 @@ const nextConfig = {
         ? `https://${process.env.VERCEL_URL}`
         : 'http://localhost:3000',
   },
+  // Add this configuration to suppress the punycode warning
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        punycode: false,
+      };
+    }
+    return config;
+  },
   // Remove static export for now to allow API routes
   output: 'standalone',
   trailingSlash: true,
