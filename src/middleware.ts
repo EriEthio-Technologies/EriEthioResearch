@@ -33,10 +33,7 @@ export default withAuth({
 // Combined config for both auth and analytics
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/api/admin/:path*',
-    '/dashboard',
-    '/settings'
+    '/((?!api/web-vitals|_next/static|_next/image|favicon.ico).*)',
   ]
 };
 
