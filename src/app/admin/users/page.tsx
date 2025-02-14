@@ -8,6 +8,9 @@ import { useUserManagement } from '@/hooks/useUserManagement';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AdminLayout, DataTable } from '@/components/admin';
 import { UserRow } from './_components/UserRow';
+import { useQuery } from '@tanstack/react-query';
+import { Virtuoso } from 'react-virtuoso';
+import { UserLoadingSkeleton } from '@/components/LoadingSkeleton';
 
 const UsersManagementWithErrorBoundary = () => (
   <ErrorBoundary fallback={<div className="text-red-500 p-4">Error loading users management</div>}>
@@ -25,6 +28,18 @@ export default function UsersManagement() {
     handleUpdateRole
   } = useUserManagement();
   const router = useRouter();
+
+  const { data, fetchNextPage } = useQuery({
+    queryKey: ['users'],
+    queryFn: async ({ pageParam = 0 }) => {
+      const { data } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .range(pageParam, pageParam + 9);
+      return data;
+    },
+    getNextPageParam: (lastPage, pages) => pages.length * 10
+  });
 
   if (loading) {
     return (
@@ -53,17 +68,17 @@ export default function UsersManagement() {
         </motion.button>
       }
     >
-      <DataTable headers={['User', 'Role', 'Created', 'Actions']}>
-        {users.map((user) => (
-          <UserRow
-            key={user.id}
-            user={user}
-            handleUpdateRole={handleUpdateRole}
-            handleDeleteUser={handleDeleteUser}
-            actionLoading={actionLoading}
-          />
-        ))}
-      </DataTable>
+      <Virtuoso
+        useWindowScroll
+        data={data?.pages.flat()}
+        endReached={() => fetchNextPage()}
+        components={{
+          LoadingIndicator: () => <UserLoadingSkeleton />
+        }}
+        itemContent={(index, user) => (
+          <UserRow key={user.id} user={user} />
+        )}
+      />
     </AdminLayout>
   );
 }

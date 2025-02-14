@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useAdminResource = <T extends unknown>(
   supabase: SupabaseClient,
@@ -11,6 +12,8 @@ export const useAdminResource = <T extends unknown>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const fetchData = useCallback(async () => {
     try {
@@ -32,6 +35,13 @@ export const useAdminResource = <T extends unknown>(
     if (!window.confirm('Are you sure you want to delete this item?')) return;
     
     setActionLoading(true);
+    await queryClient.cancelQueries([tableName]);
+    const previous = queryClient.getQueryData([tableName]);
+    
+    queryClient.setQueryData([tableName], (old) => 
+      old.filter(item => item.id !== id)
+    );
+    
     try {
       const { error } = await supabase
         .from(tableName)
@@ -47,11 +57,12 @@ export const useAdminResource = <T extends unknown>(
 
       setData(prev => prev.filter(item => item.id !== id));
     } catch (err) {
+      queryClient.setQueryData([tableName], previous);
       setError(err instanceof Error ? err.message : 'Deletion failed');
     } finally {
       setActionLoading(false);
     }
-  }, [supabase, tableName]);
+  }, [supabase, tableName, queryClient]);
 
   useEffect(() => {
     const channel = supabase

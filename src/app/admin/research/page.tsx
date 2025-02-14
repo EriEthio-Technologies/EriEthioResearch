@@ -7,6 +7,8 @@ import { AdminLayout, DataTable } from '@/components/admin';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { supabaseAdmin } from '@/lib/supabase';
 import ResearchRow from './_components/ResearchRow';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Virtuoso } from 'react-virtuoso';
 
 export default function ResearchManagement() {
   const router = useRouter();
@@ -16,6 +18,18 @@ export default function ResearchManagement() {
     actionLoading,
     handleDelete
   } = useAdminResource(supabaseAdmin, 'research_projects');
+
+  const { data, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['research'],
+    queryFn: async ({ pageParam = 0 }) => {
+      const { data, error } = await supabaseAdmin
+        .from('research')
+        .select('*')
+        .range(pageParam, pageParam + 9);
+      return data;
+    },
+    getNextPageParam: (lastPage, pages) => pages.length * 10
+  });
 
   return (
     <AdminLayout
@@ -32,16 +46,14 @@ export default function ResearchManagement() {
         </motion.button>
       }
     >
-      <DataTable headers={['Project', 'Status', 'Lead', 'Created', 'Actions']}>
-        {projects.map((project) => (
-          <ResearchRow
-            key={project.id}
-            project={project}
-            onDelete={() => handleDelete(project.id, `Project ${project.title} deleted`)}
-            actionLoading={actionLoading}
-          />
-        ))}
-      </DataTable>
+      <Virtuoso
+        useWindowScroll
+        data={data?.pages.flat()}
+        endReached={() => fetchNextPage()}
+        itemContent={(index, project) => (
+          <ResearchRow key={project.id} project={project} />
+        )}
+      />
     </AdminLayout>
   );
 } 

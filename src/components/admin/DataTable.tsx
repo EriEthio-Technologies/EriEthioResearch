@@ -11,7 +11,8 @@ const container = {
   }
 };
 
-export const DataTable = memo(({
+// Memoize table component
+const DataTable = memo(({
   headers,
   children,
   emptyMessage = "No data available",

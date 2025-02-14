@@ -3,16 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ArrowLeft } from 'lucide-react';
 import UserForm from '@/components/UserForm';
+import { withAdmin } from '@/lib/withAdmin';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-export default function NewUser() {
+export default withAdmin(['admin'])(function NewUser() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -20,20 +16,16 @@ export default function NewUser() {
     setIsLoading(true);
     try {
       // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: formData.email,
         password: formData.password!,
-        options: {
-          data: {
-            full_name: formData.full_name,
-          },
-        },
+        user_metadata: { full_name: formData.full_name }
       });
 
       if (authError) throw authError;
 
       // Create user profile
-      const { error: profileError } = await supabase
+      const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .insert([{
           id: authData.user!.id,
@@ -45,7 +37,7 @@ export default function NewUser() {
       if (profileError) throw profileError;
 
       // Log activity
-      await supabase.from('admin_activity').insert({
+      await supabaseAdmin.from('admin_activity').insert({
         type: 'user_created',
         description: `New user "${formData.email}" was created with role ${formData.role}`,
       });
@@ -94,4 +86,4 @@ export default function NewUser() {
       </motion.div>
     </div>
   );
-} 
+}); 

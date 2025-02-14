@@ -1,15 +1,25 @@
 {
   "version": 2,
   "framework": "nextjs",
+  "regions": ["iad1"],
   "routes": [
     {
       "src": "/api/web-vitals",
       "dest": "/api/web-vitals",
-      "methods": ["POST", "OPTIONS"]
+      "methods": ["POST", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/$1",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'self' *.sentry.io *.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.sentry.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: *.supabase.co; font-src 'self'; connect-src 'self' *.supabase.co; frame-src 'self' *.youtube.com *.vimeo.com;"
+      }
     }
   ]
 } 

@@ -230,4 +230,39 @@ export function createScrollAnimation(
     viewport: { once: true, threshold },
     custom: direction
   };
-} 
+}
+
+export const pageTransition: Variants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+export const cardVariants: Variants = {
+  hover: { scale: 1.02 },
+  tap: { scale: 0.98 }
+};
+
+export const listItemVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: (i: number) => ({
+    opacity: 1,
+    transition: { delay: i * 0.1 }
+  })
+};
+
+export const optimizedVariants = {
+  visible: { 
+    opacity: 1,
+    transition: { 
+      duration: 0.3,
+      ease: [0.17, 0.67, 0.83, 0.67] // Optimized easing curve
+    }
+  },
+  hidden: { 
+    opacity: 0,
+    transition: {
+      duration: 0.2
+    }
+  }
+}; 

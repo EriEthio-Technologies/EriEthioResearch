@@ -16,13 +16,7 @@ function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams?.get('registered') === 'true') {
-      setSuccess('Account created successfully! Please sign in.');
-    }
-  }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 

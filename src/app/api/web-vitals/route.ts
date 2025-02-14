@@ -1,28 +1,49 @@
 import { NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { securityHeaders } from '@/lib/security';
+import { rateLimit } from '@/lib/rate-limit';
+import { webVitalsSchema } from '@/lib/web-vitals-schema';
+
+export const dynamic = 'force-dynamic'; // Add this for proper ISR handling
+
+// Add rate limiting
+const limiter = rateLimit({
+  interval: 60 * 1000, // 1 minute
+  uniqueTokenPerInterval: 500 
+});
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
+    await limiter.check(5, 'CACHE_TOKEN'); // 5 requests per minute
+    const metric = await request.json();
     
-    // Add CORS headers
-    const headers = new Headers({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
+    // Validate payload using Zod schema
+    const validatedMetric = webVitalsSchema.parse(metric);
+    
+    // Store in Supabase
+    const { error } = await supabaseAdmin
+      .from('web_vitals')
+      .insert([validatedMetric]);
 
-    return new NextResponse(JSON.stringify({ status: 'ok' }), {
-      status: 200,
-      headers
-    });
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return NextResponse.json(
+        { error: 'Failed to store metrics' },
+        { status: 500, headers: securityHeaders }
+      );
+    }
+
+    return NextResponse.json(
+      { status: 'ok' },
+      { headers: securityHeaders }
+    );
+    
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error: 'Invalid request' }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500, headers: securityHeaders }
+    );
   }
 }
 
@@ -30,7 +51,7 @@ export async function POST(request: Request) {
 export async function OPTIONS() {
   return new NextResponse(null, {
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      ...securityHeaders,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
     }
