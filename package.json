@@ -21,7 +21,7 @@
     "lint:fix:style": "next lint --fix --fix-type suggestion --fix-type layout",
     "lint:fix:types": "next lint --fix --fix-type problem",
     "lint:prod": "next lint --max-warnings 0",
-    "build:deploy": "next build --no-lint"
+    "build:deploy": "next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
