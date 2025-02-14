@@ -46,6 +46,23 @@ export interface User {
 export interface Permission {
   resource: string;
   actions: string[];
-  conditions?: Record<string, unknown>;
+  conditions?: {
+    ownerOnly?: boolean;
+    teamOnly?: boolean;
+    statusIn?: string[];
+    roleIn?: UserRole[];
+    hasTag?: string[];
+    customCheck?: (context: Record<string, unknown>) => boolean;
+  };
+}
+
+// Add session type extension
+declare module 'next-auth' {
+  interface Session {
+    user: User & {
+      role: 'admin' | 'researcher' | 'user';
+      teamId?: string;
+    };
+  }
 }
 

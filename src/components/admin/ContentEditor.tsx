@@ -9,6 +9,14 @@ import { MediaUploader } from './MediaUploader';
 import { SEOAnalyzer } from './SEOAnalyzer';
 import type { Content } from '@/types/content';
 import { useSession } from 'next-auth/react';
+import DOMPurify from 'dompurify';
+
+const sanitizeContent = (dirty: string) => {
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: ['p', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: ['href']
+  });
+};
 
 export function ContentEditor({
   content,
@@ -29,11 +37,12 @@ export function ContentEditor({
   }
 
   const onSubmit = (data: Content) => {
-    onSave({
+    const sanitized = {
       ...data,
-      content: JSON.stringify(data.content),
-      published_at: data.status === 'published' ? new Date().toISOString() : undefined
-    });
+      content: sanitizeContent(data.content),
+      title: sanitizeContent(data.title)
+    };
+    onSave(sanitized);
   };
 
   return (

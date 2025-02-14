@@ -8,13 +8,15 @@ import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { Content, ContentType } from '@/types/types';
 import type { User } from '@/types/types';
+import { UserRole } from '@/types/types';
 
 interface ContentTableProps {
   type: ContentType;
   onEdit: (content: Content) => void;
+  userRole: UserRole;
 }
 
-export function ContentTable({ type, onEdit }: ContentTableProps) {
+export function ContentTable({ type, onEdit, userRole }: ContentTableProps) {
   const { data: contents, handleDelete } = useAdminResource<Content>(
     supabaseAdmin,
     'content',
@@ -47,6 +49,8 @@ export function ContentTable({ type, onEdit }: ContentTableProps) {
       console.error('Delete failed:', error instanceof Error ? error.message : 'Unknown error');
     }
   };
+
+  const canDelete = [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(userRole);
 
   return (
     <DataTable headers={['Title', 'Status', 'Author', 'Published', 'Actions']}>
@@ -81,9 +85,14 @@ export function ContentTable({ type, onEdit }: ContentTableProps) {
               >
                 <Edit className="w-5 h-5" />
               </button>
-              <button onClick={() => handleDeleteWithType(content.id)} className="text-red-500 hover:text-red-400">
-                <Trash2 className="w-5 h-5" />
-              </button>
+              {canDelete && (
+                <button 
+                  onClick={() => handleDeleteWithType(content.id)}
+                  className="text-red-500 hover:text-red-400"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </td>
         </motion.tr>

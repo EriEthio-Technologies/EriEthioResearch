@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3333",
+    
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -17,7 +18,10 @@
     "check:deploy": "npm run lint && npm run test && npm run build",
     "postdeploy": "npm run lint:prod && npm run test:e2e",
     "lint:fix": "next lint --fix",
-    "lint:prod": "next lint --max-warnings 0"
+    "lint:fix:style": "next lint --fix --fix-type suggestion --fix-type layout",
+    "lint:fix:types": "next lint --fix --fix-type problem",
+    "lint:prod": "next lint --max-warnings 0",
+    "build:deploy": "next build --no-lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

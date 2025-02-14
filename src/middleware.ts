@@ -5,29 +5,39 @@ import type { NextRequest } from 'next/server';
 import { nanoid } from 'nanoid';
 import { getToken } from 'next-auth/jwt';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const isAdmin = token?.role === 'admin';
-    const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
-
-    // Redirect non-admin users trying to access admin routes
-    if (isAdminRoute && !isAdmin) {
-      return NextResponse.redirect(new URL('/', req.url));
-    }
-
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token
+export default withAuth({
+  callbacks: {
+    authorized: ({ token }) => {
+      const protectedPaths = [
+        '/admin/:path*',
+        '/api/admin/:path*',
+        '/dashboard',
+        '/settings'
+      ];
+      
+      if (!token) return false;
+      if (token.role === 'admin') return true;
+      
+      // Custom permission checks
+      return !protectedPaths.some(path => 
+        new URL(req.nextUrl.pathname, req.url).pathname.startsWith(path)
+      );
     },
+  },
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error'
   }
-);
+});
 
 // Combined config for both auth and analytics
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*']
+  matcher: [
+    '/admin/:path*',
+    '/api/admin/:path*',
+    '/dashboard',
+    '/settings'
+  ]
 };
 
 export function middleware(request: NextRequest) {
