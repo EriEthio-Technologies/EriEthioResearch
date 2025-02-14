@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useSession } from 'next-auth/react';
 import { Lock, Play, Pause, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -127,10 +128,13 @@ export default function EducationPage() {
                 className="bg-black/30 backdrop-blur-sm rounded-lg overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all"
               >
                 <div className="aspect-video relative">
-                  <img
+                  <Image
                     src={course.thumbnail}
                     alt={course.title}
-                    className="w-full h-full object-cover"
+                    width={500}
+                    height={300}
+                    className="w-full h-full object-cover rounded-lg"
+                    priority
                   />
                   <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 rounded text-sm text-gray-300">
                     {course.duration}
@@ -183,10 +187,13 @@ export default function EducationPage() {
                 }`}
               >
                 <div className="aspect-video relative">
-                  <img
+                  <Image
                     src={course.thumbnail}
                     alt={course.title}
-                    className="w-full h-full object-cover"
+                    width={500}
+                    height={300}
+                    className="w-full h-full object-cover rounded-lg"
+                    priority
                   />
                   <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 rounded text-sm text-gray-300">
                     {course.duration}

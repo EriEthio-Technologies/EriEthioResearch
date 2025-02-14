@@ -40,9 +40,9 @@ export default function CollaboratorsManager({ projectId, leadResearcherId }: Co
   const [selectedCollaborators, setSelectedCollaborators] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchCollaborators();
     fetchAvailableResearchers();
-  }, [projectId]);
+    fetchCollaborators();
+  }, [fetchAvailableResearchers, fetchCollaborators]);
 
   async function fetchCollaborators() {
     try {

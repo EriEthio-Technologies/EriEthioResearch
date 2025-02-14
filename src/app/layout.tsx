@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { securityHeaders } from '@/lib/security'
+import GlobalErrorPage from '@/app/error'
 
 const inter = Inter({ subsets: ['latin'] })
 

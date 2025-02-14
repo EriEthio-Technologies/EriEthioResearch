@@ -5,7 +5,7 @@ import { logSecurityEvent } from '@/lib/audit';
 const handler = NextAuth({
   ...authOptions,
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       await logSecurityEvent('user_login_attempt', {
         user: user.email,
         provider: account?.provider

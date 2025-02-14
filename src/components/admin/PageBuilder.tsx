@@ -605,4 +605,7 @@ function getDefaultSettings(type: string) {
 
 function renderSectionEditor(section: PageSection, onUpdate: (id: string, updates: Partial<PageSection>) => void) {
   return <SectionEditor section={section} onUpdate={onUpdate} />;
-} 
+}
+
+{/* eslint-disable-next-line @next/next/no-img-element */}
+<img src={preview} alt="Preview" className="rounded-lg" /> 

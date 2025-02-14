@@ -16,7 +16,7 @@ const researchSchema = z.object({
   }).optional()
 });
 
-export async function PUT(request: Request, { params }) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const validated = researchSchema.safeParse(await request.json());
   if (!validated.success) {
     return NextResponse.json(

@@ -76,7 +76,7 @@ export default function UsersManagement() {
           LoadingIndicator: () => <UserLoadingSkeleton />
         }}
         itemContent={(index, user) => (
-          <UserRow key={user.id} user={user} />
+          <UserRow key={user.id} user={user} onDelete={handleDeleteUser} />
         )}
       />
     </AdminLayout>

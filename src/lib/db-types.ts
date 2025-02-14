@@ -9,6 +9,20 @@ export interface ResearchProject {
   created_at: string;
   updated_at: string;
   created_by: string;
+  collaborators?: string[];
+  attachments?: Array<{
+    name: string;
+    url: string;
+    type: string;
+  }>;
+  timeline?: {
+    start: string;
+    milestones: Array<{
+      title: string;
+      date: string;
+      completed: boolean;
+    }>;
+  };
 }
 
 export interface WebVitalsMetric {

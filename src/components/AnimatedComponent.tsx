@@ -1,6 +1,6 @@
 import { motion, useIsPresent } from 'framer-motion';
 
-const SafeMotionDiv = ({ children, ...props }) => {
+export const SafeMotionDiv = ({ children, ...props }) => {
   const isPresent = useIsPresent();
   
   return (
