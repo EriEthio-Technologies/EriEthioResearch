@@ -1,0 +1,12 @@
+name: Performance Budget
+on: [push]
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: treosh/lighthouse-ci-action@v8
+        with:
+          budgetPath: './lighthouse-budget.json'
+          uploadArtifacts: true 

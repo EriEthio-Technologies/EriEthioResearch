@@ -11,6 +11,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Badge {
   id: string;
@@ -113,9 +114,11 @@ export default function AchievementsGrid({
                 } overflow-hidden cursor-pointer transition-all`}
               >
                 <div className="aspect-square relative">
-                  <img
+                  <Image
                     src={badge.imageUrl}
                     alt={badge.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-contain p-8"
                   />
                   {!badge.earnedAt && (
@@ -147,9 +150,11 @@ export default function AchievementsGrid({
                 className="bg-black/30 backdrop-blur-sm rounded-lg border border-neon-cyan/20 hover:border-neon-cyan/50 overflow-hidden cursor-pointer transition-all"
               >
                 <div className="aspect-video relative">
-                  <img
+                  <Image
                     src={certificate.imageUrl}
                     alt={certificate.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/50" />
@@ -240,9 +245,11 @@ export default function AchievementsGrid({
               // Badge Details
               <div className="p-8">
                 <div className="aspect-square w-48 mx-auto mb-6">
-                  <img
+                  <Image
                     src={selectedItem.imageUrl}
                     alt={selectedItem.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -281,10 +288,13 @@ export default function AchievementsGrid({
               // Certificate Details
               <div>
                 <div className="aspect-video relative">
-                  <img
+                  <Image
                     src={selectedItem.imageUrl}
                     alt={selectedItem.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className="absolute inset-0 bg-black/50" />
                   <div className="absolute inset-0 flex items-center justify-center">

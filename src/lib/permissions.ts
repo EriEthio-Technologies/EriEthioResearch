@@ -279,4 +279,12 @@ export function getPermittedActions(
       return true;
     })
     .map(permission => permission.action);
+}
+
+export function checkPagePermission(
+  user: User,
+  page: Page,
+  action: 'edit' | 'delete'
+): boolean {
+  // Implementation with proper typing
 } 

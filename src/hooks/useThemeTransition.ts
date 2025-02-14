@@ -72,7 +72,7 @@ export function useThemeTransition(currentTheme: Theme) {
   useEffect(() => {
     if (!transition) return;
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     let frame: number;
 
     const animate = () => {
