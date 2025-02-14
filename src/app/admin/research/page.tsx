@@ -22,7 +22,7 @@ export default function ResearchManagement() {
   const { data, fetchNextPage } = useInfiniteQuery({
     queryKey: ['research'],
     queryFn: async ({ pageParam = 0 }) => {
-      const { data, error } = await supabaseAdmin
+      const { data } = await supabaseAdmin
         .from('research')
         .select('*')
         .range(pageParam, pageParam + 9);

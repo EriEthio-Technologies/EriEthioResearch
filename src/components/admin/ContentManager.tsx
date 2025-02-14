@@ -1,25 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ContentTable } from './ContentTable';
 import { ContentEditor } from './ContentEditor';
 import type { ContentType, Content } from '@/types/content';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase';
 
-export default function ContentManager() {
-  const { data: contentList, fetchData } = useAdminResource<Content>(
-    supabaseAdmin,
-    'content'
-  );
+interface ContentItem {
+  id: string;
+  title: string;
+  type: 'page' | 'post' | 'document';
+  status: 'draft' | 'published' | 'archived';
+  updated_at: string;
+}
 
-  const [selectedType, setSelectedType] = useState<ContentType>('blog');
+const ContentManager = () => {
+  const [contentList, setContentList] = useState<ContentItem[]>([]);
+  const [selectedType, setSelectedType] = useState<ContentItem['type']>('page');
   const [editingContent, setEditingContent] = useState<Content | null>(null);
 
+  const fetchContent = useCallback(async (type: ContentItem['type']) => {
+    const { data } = await supabase
+      .from('content')
+      .select('*')
+      .eq('type', type);
+    setContentList(data || []);
+  }, []);
+
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchContent(selectedType);
+  }, [selectedType, fetchContent]);
 
   const handleCreateContent = () => {
     setEditingContent({
@@ -42,7 +55,7 @@ export default function ContentManager() {
         </Button>
       </div>
       
-      <Tabs value={selectedType} onValueChange={v => setSelectedType(v as ContentType)}>
+      <Tabs value={selectedType} onValueChange={v => setSelectedType(v as ContentItem['type'])}>
         <TabsList className="grid grid-cols-5 w-full bg-gray-900">
           <TabsTrigger value="page">Pages</TabsTrigger>
           <TabsTrigger value="blog">Blog</TabsTrigger>
@@ -72,3 +85,5 @@ export default function ContentManager() {
     </div>
   );
 }
+
+export default ContentManager;

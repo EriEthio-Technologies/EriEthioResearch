@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
-import { ArrowLeft, Plus, Save, Eye, History } from 'lucide-react';
+import { ArrowLeft, Plus, Eye, History } from 'lucide-react';
 import PageRenderer from '@/components/PageRenderer';
 import PageBuilder from '@/components/admin/PageBuilder';
 
@@ -13,8 +13,23 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+interface PageData {
+  id: string;
+  title: string;
+  sections: PageSection[];
+  meta: any;
+  settings: any;
+}
+
+interface PageSection {
+  id: string;
+  type: string;
+  content: string;
+  // Add any other necessary properties
+}
+
 export default function EditPage() {
-  const [pageData, setPageData] = useState<any>(null);
+  const [pageData, setPageData] = useState<PageData | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -57,7 +72,7 @@ export default function EditPage() {
     fetchPage();
   }, [slug, router]);
 
-  const handleSave = async (updatedData: any) => {
+  const handleSave = async (updatedData: PageData) => {
     setSaving(true);
     try {
       // Save current version to revisions

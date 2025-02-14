@@ -14,14 +14,16 @@ const supabase = createClient(
 
 interface PageRevision {
   id: string;
-  sections: any[];
-  meta: any;
-  settings: any;
-  author: {
-    full_name: string;
-    email: string;
-  };
   created_at: string;
+  sections: Array<{
+    id: string;
+    type: string;
+    content: string;
+  }>;
+  meta: {
+    title?: string;
+    description?: string;
+  };
 }
 
 export default function PageHistory() {

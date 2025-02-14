@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { Search, Filter, Tag, ArrowRight } from 'lucide-react';
+import { useAdminResource } from '@supabase/supabase-js';
+import { Virtuoso } from 'react-virtuoso';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +21,22 @@ interface Product {
   tags: string[];
   category: string;
 }
+
+const ProductsList = () => {
+  const { data: products } = useAdminResource<Product>(
+    supabase,
+    'products'
+  );
+  
+  return (
+    <Virtuoso
+      data={products}
+      itemContent={(index, product) => (
+        <ProductRow key={product.id} product={product} />
+      )}
+    />
+  );
+};
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);

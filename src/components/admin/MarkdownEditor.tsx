@@ -34,7 +34,7 @@ interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
   onImageUpload?: (file: File) => Promise<string>;
-  onSave?: () => void;
+  onSave: () => void;
   autoSave?: boolean;
 }
 
@@ -57,8 +57,8 @@ export default function MarkdownEditor({
   const [showPreview, setShowPreview] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [textareaElement, setTextareaElement] = useState<HTMLTextAreaElement | null>(null);
-  const [history, setHistory] = useState<string[]>([value]);
-  const [historyIndex, setHistoryIndex] = useState(0);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [lastSaved, setLastSaved] = useState(value);
   const [wordCount, setWordCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
@@ -91,7 +91,7 @@ export default function MarkdownEditor({
     // Auto-save
     if (autoSave && value !== lastSaved) {
       const timeoutId = setTimeout(() => {
-        onSave?.();
+        onSave();
         setLastSaved(value);
       }, 2000);
       return () => clearTimeout(timeoutId);
@@ -113,7 +113,7 @@ export default function MarkdownEditor({
             break;
           case 's':
             e.preventDefault();
-            onSave?.();
+            onSave();
             break;
           case 'b':
             e.preventDefault();
@@ -143,10 +143,9 @@ export default function MarkdownEditor({
   }, [value, textareaElement, historyIndex]);
 
   const handleChange = (newValue: string) => {
-    onChange(newValue);
-    // Add to history
     setHistory(prev => [...prev.slice(0, historyIndex + 1), newValue]);
     setHistoryIndex(prev => prev + 1);
+    onChange(newValue);
   };
 
   const handleUndo = () => {

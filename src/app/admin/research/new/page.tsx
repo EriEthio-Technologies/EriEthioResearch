@@ -7,11 +7,24 @@ import { ArrowLeft } from 'lucide-react';
 import ResearchProjectForm from '@/components/ResearchProjectForm';
 import { supabase } from '@/lib/supabase/client';
 
+interface NewResearchProject {
+  title: string;
+  description: string;
+  collaborators: string[];
+  timeline: {
+    start: Date;
+    milestones: Array<{
+      title: string;
+      dueDate: Date;
+    }>;
+  };
+}
+
 export default function NewResearchProject() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: NewResearchProject) => {
     setIsLoading(true);
     try {
       const { error } = await supabase

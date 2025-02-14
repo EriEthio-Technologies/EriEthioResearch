@@ -27,15 +27,26 @@ async function executeCode(code: string, language: string, input?: string): Prom
   });
 }
 
-export async function POST(request: Request) {
+interface TestCase {
+  input: string;
+  expected_output: string;
+  hidden: boolean;
+}
+
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { code, language, testCases, mode } = body;
+    const body = await req.json();
+    const { code, language, testCases, mode } = body as {
+      code: string;
+      language: string;
+      testCases: TestCase[];
+      mode: 'test' | 'submit';
+    };
 
     if (!code || !language) {
       return NextResponse.json(

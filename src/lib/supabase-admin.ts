@@ -1,23 +1,20 @@
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { validateCSRFToken } from '@/lib/csrf';
 import { logSecurityEvent } from '@/lib/audit';
 
-export const supabaseAdmin = createServerClient(
+interface AdminFunctionParams {
+  _page_view_id: string;
+  _event_type: string;
+  _event_data: Record<string, unknown>;
+}
+
+export const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_SERVICE_KEY!,
   {
     auth: {
       autoRefreshToken: false,
       persistSession: false
-    },
-    global: {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Request-Origin': process.env.NODE_ENV === 'production' 
-          ? 'https://eriethioresearch.com' 
-          : 'http://localhost:3333',
-        'X-Service-Role': 'true'
-      }
     }
   }
 );
@@ -35,4 +32,7 @@ export const withAdminValidation = (handler: Function) => async (req: Request) =
   }
   
   return handler(req);
-}; 
+};
+
+export const trackPageEvent = (params: AdminFunctionParams) => 
+  supabaseAdmin.rpc('track_page_event', params); 

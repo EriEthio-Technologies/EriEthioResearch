@@ -13,6 +13,7 @@ import {
   Star
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LearningPathProps {
   id: string;
@@ -79,10 +80,13 @@ export default function LearningPathCard({
       {/* Header */}
       <div className="relative aspect-video">
         {thumbnail ? (
-          <img
+          <Image
             src={thumbnail}
             alt={title}
-            className="w-full h-full object-cover"
+            width={400}
+            height={300}
+            className="w-full h-48 object-cover"
+            priority
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-neon-cyan/20 to-neon-magenta/20" />

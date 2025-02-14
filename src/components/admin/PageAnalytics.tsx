@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
@@ -33,7 +33,7 @@ interface DailyStats {
   uniqueVisitors: number;
 }
 
-export function PageAnalytics() {
+export function PageAnalytics({ pageId }: { pageId: string }) {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
   const [pageViews, setPageViews] = useState<PageView[]>([]);
@@ -42,43 +42,17 @@ export function PageAnalytics() {
 
   const supabase = createClient();
 
+  const fetchAnalytics = useCallback(async () => {
+    const { data } = await supabase
+      .from('page_analytics')
+      .select('*')
+      .eq('page_id', pageId);
+    return data;
+  }, [pageId]);
+
   useEffect(() => {
     fetchAnalytics();
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
-    try {
-      setLoading(true);
-
-      // Get the date range
-      const now = new Date();
-      const days = parseInt(timeRange);
-      const startDate = new Date(now.setDate(now.getDate() - days));
-
-      // Fetch page views
-      const { data: views, error } = await supabase
-        .from('page_views')
-        .select('*')
-        .gte('created_at', startDate.toISOString())
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      setPageViews(views);
-
-      // Process analytics by page
-      const pageStats = processPageStats(views);
-      setAnalytics(pageStats);
-
-      // Process daily stats
-      const dailyData = processDailyStats(views, startDate);
-      setDailyStats(dailyData);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fetchAnalytics]);
 
   const processPageStats = (views: PageView[]): PageAnalytics[] => {
     const stats = new Map<string, {

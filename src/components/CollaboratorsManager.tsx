@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { Users, Plus, Trash2, UserPlus, UserMinus, Shield } from 'lucide-react';
@@ -14,8 +14,7 @@ interface Collaborator {
   id: string;
   full_name: string;
   email: string;
-  role: ProjectMemberRole;
-  joined_date: string;
+  role: string;
 }
 
 interface CollaboratorsManagerProps {
@@ -39,12 +38,7 @@ export default function CollaboratorsManager({ projectId, leadResearcherId }: Co
   const [selectedRole, setSelectedRole] = useState<ProjectMemberRole>('researcher');
   const [selectedCollaborators, setSelectedCollaborators] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetchAvailableResearchers();
-    fetchCollaborators();
-  }, [fetchAvailableResearchers, fetchCollaborators]);
-
-  async function fetchCollaborators() {
+  const fetchCollaborators = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('project_collaborators')
@@ -72,9 +66,9 @@ export default function CollaboratorsManager({ projectId, leadResearcherId }: Co
     } finally {
       setLoading(false);
     }
-  }
+  }, [projectId]);
 
-  async function fetchAvailableResearchers() {
+  const fetchAvailableResearchers = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -92,7 +86,12 @@ export default function CollaboratorsManager({ projectId, leadResearcherId }: Co
     } catch (error) {
       console.error('Error fetching available researchers:', error);
     }
-  }
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchCollaborators();
+    fetchAvailableResearchers();
+  }, [fetchCollaborators, fetchAvailableResearchers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

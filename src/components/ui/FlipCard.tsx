@@ -13,10 +13,11 @@ interface FlipCardProps {
     from: string;
     to: string;
   };
+  path: string;
   onClick?: () => void;
 }
 
-export function FlipCard({ title, subtitle, summary, tags, gradient, onClick }: FlipCardProps) {
+export function FlipCard({ title, subtitle, summary, tags, gradient, path, onClick }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (

@@ -13,10 +13,12 @@ function SignInForm() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
 
-
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -87,12 +89,6 @@ function SignInForm() {
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        {success && (
-          <Alert>
-            <AlertDescription className="text-green-500">{success}</AlertDescription>
           </Alert>
         )}
 
@@ -231,12 +227,11 @@ function SignInForm() {
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="text-neon-cyan text-xl">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg">
+        <h1 className="text-3xl font-bold text-center text-white">Sign In</h1>
+        <SignInForm />
       </div>
-    }>
-      <SignInForm />
-    </Suspense>
+    </div>
   );
 }

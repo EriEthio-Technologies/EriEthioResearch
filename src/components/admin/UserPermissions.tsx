@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import { Search, UserPlus, Loader2 } from 'lucide-react';
 interface User {
   id: string;
   email: string;
-  role: string;
+  role: 'admin' | 'editor' | 'viewer';
   permissions: string[];
   created_at: string;
   last_sign_in: string | null;
@@ -42,26 +42,25 @@ export function UserPermissions() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    fetchUsers();
+  const fetchUsers = useCallback(async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, email, role');
+    return data as User[];
   }, []);
 
-  const fetchUsers = async () => {
-    try {
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setUsers(profiles);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchUsers()
+      .then(data => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+        toast.error('Failed to fetch users');
+        setLoading(false);
+      });
+  }, [fetchUsers]);
 
   const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
@@ -74,7 +73,7 @@ export function UserPermissions() {
       if (error) throw error;
 
       setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole } : user
+        user.id === userId ? { ...user, role: newRole as 'admin' | 'editor' | 'viewer' } : user
       ));
 
       toast.success('User role updated successfully');

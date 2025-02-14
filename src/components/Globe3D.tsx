@@ -8,14 +8,15 @@ export const Globe3D: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!mountRef.current) return
+    const currentMount = mountRef.current
+    if (!currentMount) return
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
     const renderer = new THREE.WebGLRenderer({ alpha: true })
 
     renderer.setSize(400, 400)
-    mountRef.current.appendChild(renderer.domElement)
+    currentMount.appendChild(renderer.domElement)
 
     const geometry = new THREE.SphereGeometry(1, 32, 32)
     const material = new THREE.MeshBasicMaterial({
@@ -37,7 +38,7 @@ export const Globe3D: React.FC = () => {
     animate()
 
     return () => {
-      mountRef.current?.removeChild(renderer.domElement)
+      currentMount?.removeChild(renderer.domElement)
     }
   }, [])
 

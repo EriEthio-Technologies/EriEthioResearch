@@ -355,6 +355,15 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
+interface DataPoint {
+  date: string;
+  value: number;
+}
+
+export function LineChart({ data }: { data: DataPoint[] }) {
+  // ... existing logic
+}
+
 export {
   ChartContainer,
   ChartTooltip,

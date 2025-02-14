@@ -27,8 +27,6 @@ interface Course {
 export default function EducationPage() {
   const { data: session } = useSession();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     fetchCourses();
@@ -45,8 +43,6 @@ export default function EducationPage() {
       setCourses(data || []);
     } catch (error) {
       console.error('Error fetching courses:', error);
-    } finally {
-      setLoading(false);
     }
   }
 

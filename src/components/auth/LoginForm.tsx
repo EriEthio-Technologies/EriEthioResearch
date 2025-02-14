@@ -5,11 +5,17 @@ import { useState } from "react"
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt with:", { email, password })
+    try {
+      // Handle login logic here
+      console.log("Login attempt with:", { email, password })
+    } catch (error) {
+      console.error('Error logging in:', error instanceof Error ? error.message : 'Unknown error')
+      setError('An error occurred during login. Please try again.')
+    }
   }
 
   return (

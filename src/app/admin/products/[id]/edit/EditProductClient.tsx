@@ -12,6 +12,19 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  sku: string;
+  stock: number;
+  images: Array<{
+    url: string;
+    alt: string;
+  }>;
+}
+
 export default function EditProductClient() {
   const [product, setProduct] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +54,7 @@ export default function EditProductClient() {
     fetchProduct();
   }, [params.id, router]);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: Product) => {
     setIsLoading(true);
     try {
       const { error } = await supabase

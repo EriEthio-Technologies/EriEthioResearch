@@ -156,6 +156,17 @@ const rolePermissions: RolePermissions = {
   ]
 };
 
+interface User {
+  id: string;
+  role: string;
+  permissions: string[];
+}
+
+interface Page {
+  id: string;
+  permissions: string[];
+}
+
 export function can(
   session: Session | null,
   action: Action,
@@ -286,5 +297,9 @@ export function checkPagePermission(
   page: Page,
   action: 'edit' | 'delete'
 ): boolean {
-  // Implementation with proper typing
+  return user.permissions.includes('edit') || page.permissions.includes(user.role);
+}
+
+export function canEditPage(user: User, page: Page) {
+  return user.permissions.includes('edit') || page.permissions.includes(user.role);
 } 

@@ -9,19 +9,15 @@ export interface ResearchProject {
   created_at: string;
   updated_at: string;
   created_by: string;
-  collaborators?: string[];
+  collaborators: string[];
   attachments?: Array<{
     name: string;
     url: string;
     type: string;
   }>;
-  timeline?: {
-    start: string;
-    milestones: Array<{
-      title: string;
-      date: string;
-      completed: boolean;
-    }>;
+  timeline: {
+    start: Date;
+    milestones: Milestone[];
   };
 }
 
@@ -32,6 +28,7 @@ export interface WebVitalsMetric {
   label?: string;
   page_url: string;
   user_agent: string;
+  customProperties?: Record<string, string | number>;
 }
 
 export type StrictResearchProject = ResearchProject & {
@@ -49,4 +46,10 @@ export type StrictResearchProject = ResearchProject & {
       completed: boolean;
     }>;
   };
-}; 
+};
+
+interface Milestone {
+  title: string;
+  dueDate: Date;
+  completed: boolean;
+} 

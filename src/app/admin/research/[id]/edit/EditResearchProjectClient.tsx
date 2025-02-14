@@ -17,6 +17,21 @@ const supabase = createClient(
 
 type ActiveTab = 'details' | 'collaborators' | 'publications' | 'milestones';
 
+interface ResearchUpdate {
+  title: string;
+  description: string;
+  status: 'draft' | 'published' | 'archived';
+  collaborators: string[];
+  timeline: {
+    start: Date;
+    milestones: Array<{
+      title: string;
+      dueDate: Date;
+      completed: boolean;
+    }>;
+  };
+}
+
 export default function EditResearchProjectClient() {
   const [project, setProject] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +62,7 @@ export default function EditResearchProjectClient() {
     fetchProject();
   }, [params.id, router]);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: ResearchUpdate) => {
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -58,8 +73,8 @@ export default function EditResearchProjectClient() {
           methodology: formData.methodology,
           status: formData.status,
           lead_researcher_id: formData.lead_researcher_id,
-          start_date: formData.start_date,
-          end_date: formData.end_date,
+          start_date: formData.timeline.start,
+          end_date: formData.timeline.end,
           tags: formData.tags,
         })
         .eq('id', params.id);

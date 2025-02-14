@@ -1,4 +1,7 @@
-metadata?: Record<string, unknown>; 
+interface DatabaseTypes {
+  metadata?: Record<string, unknown>;
+  // Add other type definitions as needed
+}
 
 export interface User {
   id: string;

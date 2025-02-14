@@ -5,12 +5,29 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserRole } from '@/lib/db/types';
 import { useUserManagement } from '@/hooks/useUserManagement';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import  ErrorBoundary  from '@/components/ErrorBoundary';
 import { AdminLayout, DataTable } from '@/components/admin';
 import { UserRow } from './_components/UserRow';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { Virtuoso } from 'react-virtuoso';
 import { UserLoadingSkeleton } from '@/components/LoadingSkeleton';
+import { SupabaseClient } from '@/lib/supabase';
+import type { QueryFunctionContext } from '@tanstack/react-query';
+
+interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+}
+
+const UserContent = ({ users }: { users: User[] }) => (
+  <div className="space-y-4">
+    {users.map(user => (
+      <UserRow key={user.id} user={user} />
+    ))}
+  </div>
+);
 
 const UsersManagementWithErrorBoundary = () => (
   <ErrorBoundary fallback={<div className="text-red-500 p-4">Error loading users management</div>}>
@@ -18,28 +35,70 @@ const UsersManagementWithErrorBoundary = () => (
   </ErrorBoundary>
 );
 
-export default function UsersManagement() {
-  const {
-    users,
-    loading,
-    actionLoading,
-    error,
-    handleDeleteUser,
-    handleUpdateRole
-  } = useUserManagement();
-  const router = useRouter();
+const UsersManagementList = () => {
+  const { data, fetchNextPage } = useInfiniteQuery<User[]>({
+    queryKey: ['users'],
+     queryFn: async ({ pageParam }: { pageParam: number }) => { 
+        const supabaseAdmin = SupabaseClient.getAdminInstance();
+        const { data } = await supabaseAdmin.from('users')
+          .select('*')
+          .range(pageParam, pageParam + 9);
+      return data || [];
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      return allPages.length * 10;
+    }
+  });
 
-  const { data, fetchNextPage } = useQuery({
+  return (
+    <Virtuoso
+      data={data?.pages.flat()}
+      itemContent={(index, user) => (
+        <UserRow key={user.id} user={user} />
+      )}
+    />
+  );
+};
+
+const UsersFetcher = () => {
+  const { data, fetchNextPage } = useInfiniteQuery<User[]>({
     queryKey: ['users'],
     queryFn: async ({ pageParam = 0 }) => {
-      const { data } = await supabaseAdmin
+      const supabaseAdmin = SupabaseClient.getAdminInstance();
+      
+      const { data, error } = await supabaseAdmin
         .from('users')
         .select('*')
-        .range(pageParam, pageParam + 9);
-      return data;
+        .range(pageParam, pageParam + 9)
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(`Supabase error: ${error.message}`);
+      return data as User[];
     },
-    getNextPageParam: (lastPage, pages) => pages.length * 10
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => 
+      lastPage.length ? allPages.length * 10 : undefined,
   });
+
+  return (
+    <Virtuoso
+      useWindowScroll
+      data={data?.pages.flat()}
+      endReached={() => fetchNextPage()}
+      components={{
+        Footer: () => <UserLoadingSkeleton />
+      }}
+      itemContent={(index, user: User) => (
+        <UserRow key={user.id} user={user} />
+      )}
+    />
+  );
+};
+
+function UsersManagement() {
+  const { loading, error } = useUserManagement();
+  const router = useRouter();
 
   if (loading) {
     return (
@@ -55,7 +114,7 @@ export default function UsersManagement() {
 
   return (
     <AdminLayout 
-      title="Users Management"
+      title="User Management"
       actions={
         <motion.button
           initial={{ opacity: 0 }}
@@ -68,17 +127,11 @@ export default function UsersManagement() {
         </motion.button>
       }
     >
-      <Virtuoso
-        useWindowScroll
-        data={data?.pages.flat()}
-        endReached={() => fetchNextPage()}
-        components={{
-          LoadingIndicator: () => <UserLoadingSkeleton />
-        }}
-        itemContent={(index, user) => (
-          <UserRow key={user.id} user={user} onDelete={handleDeleteUser} />
-        )}
-      />
+      <ErrorBoundary fallback={<div className="text-red-500 p-4">Error loading users</div>}>
+        <UsersFetcher />
+      </ErrorBoundary>
     </AdminLayout>
   );
 }
+
+export default UsersManagement;

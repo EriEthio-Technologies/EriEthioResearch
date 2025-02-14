@@ -7,16 +7,9 @@ import { supabase } from '@/lib/supabase/client';
 interface Publication {
   id: string;
   title: string;
-  abstract: string;
   authors: string[];
-  publication_date: string;
+  published_date: string;
   journal: string;
-  doi: string;
-  url: string;
-  citation_count: number;
-  project_id: string;
-  created_at: string;
-  tags: string[];
 }
 
 interface PublicationsManagerProps {

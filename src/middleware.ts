@@ -1,9 +1,6 @@
 import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
-import { nanoid } from 'nanoid';
-import { getToken } from 'next-auth/jwt';
 import { securityHeaders } from '@/lib/security';
 
 export default withAuth({
@@ -39,29 +36,14 @@ export const config = {
 };
 
 export function middleware(request: NextRequest) {
+  // Example security headers
   const response = NextResponse.next();
   
-  // Apply security headers
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-
-  // API-specific cache control
-  if (request.nextUrl.pathname.startsWith('/api')) {
-    response.headers.set('Cache-Control', 'no-store, max-age=0');
-  }
-
-  response.headers.set('Content-Security-Policy', `
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' *.sentry.io cdn.framer.com;
-    style-src 'self' 'unsafe-inline' *.framer.com;
-    img-src 'self' data: *.supabase.co *.framerusercontent.com;
-    connect-src 'self' *.supabase.co;
-    frame-src 'self' *.youtube.com *.vimeo.com;
-  `.replace(/\n/g, ' '));
-
+  // Set security headers
+  response.headers.set('Content-Security-Policy', "default-src 'self'");
   response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
   
   return response;
 } 

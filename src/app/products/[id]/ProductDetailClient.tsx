@@ -5,26 +5,26 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft, Tag, Check, Info, Star } from 'lucide-react';
+import Image from 'next/image';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface ProductDetail {
+interface Product {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  features: string[];
-  specifications: Record<string, string>;
-  benefits: string[];
-  imageUrl?: string;
-  tags: string[];
-  category: string;
+  price: number;
+  images: Array<{
+    url: string;
+    alt: string;
+  }>;
 }
 
 export default function ProductDetailClient() {
-  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'specs' | 'benefits'>('overview');
   const router = useRouter();
@@ -88,21 +88,24 @@ export default function ProductDetailClient() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
           >
-            {product.imageUrl && (
+            {product.images && product.images.length > 0 && (
               <motion.div 
                 className="w-full aspect-video rounded-lg overflow-hidden bg-black/30 border border-neon-cyan/20"
                 whileHover={{ scale: 1.02 }}
               >
-                <img
-                  src={product.imageUrl}
-                  alt={product.title}
-                  className="w-full h-full object-cover"
+                <Image
+                  src={product.images[0].url}
+                  alt={product.images[0].alt}
+                  width={600}
+                  height={400}
+                  className="w-full h-64 object-cover rounded-lg"
+                  priority
                 />
               </motion.div>
             )}
 
             <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg border border-neon-cyan/20">
-              <h1 className="text-3xl font-bold text-neon-cyan mb-4">{product.title}</h1>
+              <h1 className="text-3xl font-bold text-neon-cyan mb-4">{product.name}</h1>
               <p className="text-gray-300 mb-6">{product.description}</p>
               
               {product.tags && product.tags.length > 0 && (
@@ -251,7 +254,7 @@ export default function ProductDetailClient() {
             >
               <h3 className="text-xl font-semibold text-neon-cyan mb-4">Ready to Get Started?</h3>
               <p className="text-gray-300 mb-6">
-                Contact our team to learn more about how {product.title} can help your research.
+                Contact our team to learn more about how {product.name} can help your research.
               </p>
               <motion.button
                 onClick={() => router.push('/contact')}

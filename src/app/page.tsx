@@ -76,7 +76,7 @@ const RESEARCH_CARDS = [
   }
 ];
 
-export default function HomePage() {
+export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
   const [stats, setStats] = useState({

@@ -12,10 +12,10 @@ export async function POST(req: NextRequest) {
       { status: 200, headers: securityHeaders }
     );
   } catch (error) {
-    console.error('Password reset failed:', error);
+    console.error('Password reset error:', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
-      { error: 'Password reset failed' },
-      { status: 500, headers: securityHeaders }
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 } 

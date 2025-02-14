@@ -5,10 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 
 interface ImageUploadProps {
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (url: string) => void;
   maxSize?: number; // in MB
   aspectRatio?: number;
   className?: string;
@@ -19,7 +20,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export function ImageUpload({
+export default function ImageUpload({
   value,
   onChange,
   maxSize = 5,
@@ -105,9 +106,11 @@ export function ImageUpload({
             exit={{ opacity: 0 }}
             className="relative"
           >
-            <img
+            <Image
               src={value}
               alt="Uploaded image"
+              width={400}
+              height={300}
               className="w-full h-full object-cover rounded-lg"
               style={aspectRatio ? { aspectRatio } : undefined}
             />

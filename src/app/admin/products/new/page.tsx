@@ -7,11 +7,19 @@ import { ArrowLeft } from 'lucide-react';
 import ProductForm from '@/components/ProductForm';
 import { supabase } from '@/lib/supabase/client';
 
+interface NewProductForm {
+  name: string;
+  description: string;
+  price: number;
+  sku: string;
+  stock: number;
+}
+
 export default function NewProduct() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: NewProductForm) => {
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -23,7 +31,7 @@ export default function NewProduct() {
       // Log activity
       await supabase.from('admin_activity').insert({
         type: 'product_created',
-        description: `New product "${formData.title}" was created`,
+        description: `New product "${formData.name}" was created`,
       });
 
       router.push('/admin/products');

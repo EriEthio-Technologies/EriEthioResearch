@@ -2,18 +2,26 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, Trash2, Archive, Clock, Tag } from 'lucide-react';
 
+interface BulkAction {
+  name: string;
+  label: string;
+  icon: React.ElementType;
+  requiresConfirmation?: boolean;
+  requiresInput?: boolean;
+  inputType?: 'select' | 'text' | 'tags';
+  options?: string[];
+}
+
 interface BulkActionsMenuProps {
   selectedItems: string[];
   onBulkAction: (action: string, data?: any) => Promise<void>;
-  actions: {
-    name: string;
-    label: string;
-    icon: any;
-    requiresConfirmation?: boolean;
-    requiresInput?: boolean;
-    inputType?: 'select' | 'text' | 'tags';
-    options?: string[];
-  }[];
+  actions: BulkAction[];
+}
+
+interface BulkActionsProps {
+  selectedItems: string[];
+  onDelete: (ids: string[]) => void;
+  onArchive: (ids: string[]) => void;
 }
 
 export default function BulkActionsMenu({ selectedItems, onBulkAction, actions }: BulkActionsMenuProps) {

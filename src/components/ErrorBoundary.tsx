@@ -12,21 +12,16 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state = { hasError: false };
+export default function ErrorBoundary({ children, fallback }: ErrorBoundaryProps) {
+  const [hasError, setHasError] = useState(false);
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
+  const handleError = (error: Error, info: ErrorInfo) => {
     logSecurityEvent('component_error', {
       error: error.toString(),
       stack: info.componentStack
     });
-  }
+    setHasError(true);
+  };
 
-  render() {
-    return this.state.hasError ? this.props.fallback : this.props.children;
-  }
+  return hasError ? fallback : children;
 } 

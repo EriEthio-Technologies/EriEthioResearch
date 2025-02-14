@@ -16,17 +16,20 @@ interface CustomUser {
   role?: string; // Add the role property
 }
 
-// Extend the session type to use the custom user type
+// Add custom session type
 interface CustomSession extends Session {
-  user: CustomUser;
+  user: {
+    id: string;
+    role: 'admin' | 'user';
+  };
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: CustomSession | null };
   const router = useRouter();
 
   useEffect(() => {
-    if (!session || session.user.role !== 'admin') {
+    if (!session?.user?.role || session.user.role !== 'admin') {
       router.push('/auth/signin');
     }
   }, [session, router]);

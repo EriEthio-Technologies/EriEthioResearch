@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a single instance of the Supabase client
-class SupabaseClient {
+export class SupabaseClient {
   private static instance: ReturnType<typeof createClient> | null = null;
   private static adminInstance: ReturnType<typeof createClient> | null = null;
 

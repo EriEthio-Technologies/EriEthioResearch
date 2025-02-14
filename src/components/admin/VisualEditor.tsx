@@ -7,8 +7,22 @@ import { Section } from './EditorSection';
 import { createPortal } from 'react-dom';
 import { SectionType } from '@/types/page';
 
-export default function VisualEditor({ initialSections }: { initialSections: SectionType[] }) {
-  const [sections, setSections] = useState<SectionType[]>(initialSections);
+interface VisualComponent {
+  id: string;
+  type: string;
+  props: Record<string, unknown>;
+}
+
+interface VisualEditorProps {
+  initialComponents: VisualComponent[];
+  onUpdate: (components: VisualComponent[]) => void;
+}
+
+export default function VisualEditor({ 
+  initialComponents,
+  onUpdate 
+}: VisualEditorProps) {
+  const [sections, setSections] = useState<SectionType[]>(initialComponents.map(c => c as SectionType));
   const [activeSection, setActiveSection] = useState<SectionType | null>(null);
 
   const handleDragStart = useCallback((event: any) => {

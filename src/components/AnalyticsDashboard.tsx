@@ -16,7 +16,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { Package, Users, BookOpen, Activity, Flag } from 'lucide-react';
+import { BarChart as LucideBarChart } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,6 +54,28 @@ interface Analytics {
 }
 
 const COLORS = ['#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
+
+interface ProcessedData {
+  date: string;
+  projects: number;
+  publications: number;
+}
+
+const processMonthlyData = (data: any[]): ProcessedData[] => {
+  const monthlyCounts = data.reduce((acc, item) => {
+    const month = new Date(item.created_at).toISOString().slice(0, 7);
+    acc[month] = {
+      projects: (acc[month]?.projects || 0) + 1,
+      publications: (acc[month]?.publications || 0) + (item.publications?.length || 0)
+    };
+    return acc;
+  }, {} as Record<string, { projects: number; publications: number }>);
+
+  return Object.entries(monthlyCounts).map(([date, counts]) => ({
+    date,
+    ...counts
+  }));
+};
 
 export default function AnalyticsDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -102,22 +124,7 @@ export default function AnalyticsDashboard() {
       }));
 
       // Process monthly data
-      const monthlyProjects = new Map<string, number>();
-      const monthlyPublications = new Map<string, number>();
-
-      monthlyData?.forEach(({ created_at }) => {
-        const month = new Date(created_at).toISOString().slice(0, 7);
-        monthlyProjects.set(month, (monthlyProjects.get(month) || 0) + 1);
-      });
-
-      const projectsByMonth = Array.from(monthlyProjects.entries())
-        .map(([date, projects]) => ({
-          date,
-          projects,
-          publications: monthlyPublications.get(date) || 0
-        }))
-        .sort((a, b) => a.date.localeCompare(b.date))
-        .slice(-12); // Last 12 months
+      const projectsByMonth = processMonthlyData(monthlyData || []);
 
       // Process researcher data
       const researcherContributions = researcherData?.map(researcher => ({
@@ -185,7 +192,7 @@ export default function AnalyticsDashboard() {
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-neon-magenta">Total Projects</h3>
-            <Package className="w-5 h-5 text-neon-cyan" />
+            <LucideBarChart className="w-5 h-5 text-neon-cyan" />
           </div>
           <p className="text-3xl font-bold text-neon-cyan">{analytics.overview.totalProjects}</p>
           <div className="mt-2 text-sm text-gray-400">
@@ -201,7 +208,7 @@ export default function AnalyticsDashboard() {
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-neon-magenta">Researchers</h3>
-            <Users className="w-5 h-5 text-neon-cyan" />
+            <LucideBarChart className="w-5 h-5 text-neon-cyan" />
           </div>
           <p className="text-3xl font-bold text-neon-cyan">{analytics.overview.totalResearchers}</p>
           <div className="mt-2 text-sm text-gray-400">
@@ -217,7 +224,7 @@ export default function AnalyticsDashboard() {
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-neon-magenta">Publications</h3>
-            <BookOpen className="w-5 h-5 text-neon-cyan" />
+            <LucideBarChart className="w-5 h-5 text-neon-cyan" />
           </div>
           <p className="text-3xl font-bold text-neon-cyan">{analytics.overview.totalPublications}</p>
           <div className="mt-2 text-sm text-gray-400">

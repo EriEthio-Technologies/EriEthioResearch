@@ -1,7 +1,12 @@
 import { useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-export function usePageEvents() {
+interface PageEvent {
+  type: string;
+  data: Record<string, unknown>;
+}
+
+export function usePageEvents(callback: (event: PageEvent) => void) {
   const supabase = createClient();
 
   const trackEvent = useCallback(async (
@@ -115,6 +120,14 @@ export function usePageEvents() {
     document.addEventListener('submit', handleSubmit);
     document.addEventListener('copy', handleCopy);
 
+    // Proper event typing
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type?.startsWith('page:')) {
+        callback(event.data);
+      }
+    };
+    window.addEventListener('message', handler);
+
     // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -126,8 +139,10 @@ export function usePageEvents() {
 
       // Track final time on page
       trackTimeOnPage();
+
+      window.removeEventListener('message', handler);
     };
-  }, [trackEvent]);
+  }, [trackEvent, callback]);
 
   return { trackEvent };
 } 

@@ -12,21 +12,23 @@ interface TestCase {
 }
 
 interface CodeEditorProps {
-  initialCode?: string;
-  language?: string;
+  initialCode: string;
+  language: string;
   testCases?: TestCase[];
   onSave?: (code: string) => void;
   onSubmit?: (code: string, results: any) => void;
   readOnly?: boolean;
+  onCodeChange: (code: string) => void;
 }
 
 export default function CodeEditor({
-  initialCode = '',
-  language = 'python',
+  initialCode,
+  language,
   testCases = [],
   onSave,
   onSubmit,
-  readOnly = false
+  readOnly = false,
+  onCodeChange
 }: CodeEditorProps) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState('');
@@ -160,7 +162,10 @@ export default function CodeEditor({
           defaultLanguage={language}
           defaultValue={code}
           theme={theme}
-          onChange={(value) => setCode(value || '')}
+          onChange={(value) => {
+            setCode(value || '');
+            onCodeChange(value || '');
+          }}
           options={{
             readOnly,
             minimap: { enabled: false },

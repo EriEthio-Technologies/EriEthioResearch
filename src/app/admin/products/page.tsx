@@ -12,10 +12,11 @@ export default function ProductsManagement() {
   const router = useRouter();
   const {
     data: products,
-    loading,
-    actionLoading,
-    handleDelete
-  } = useAdminResource(supabaseAdmin, 'products');
+    error
+  } = useAdminResource<Product>(
+    supabaseAdmin,
+    'products'
+  );
 
   return (
     <AdminLayout

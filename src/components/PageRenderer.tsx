@@ -8,15 +8,16 @@ import { iconMap } from '@/lib/icons';
 
 interface PageSection {
   id: string;
-  type: 'hero' | 'text' | 'image' | 'video' | 'grid' | 'columns' | 'cards' | 'markdown';
-  content: any;
-  settings: {
-    background?: string;
-    padding?: string;
-    fullWidth?: boolean;
-    alignment?: 'left' | 'center' | 'right';
-    textColor?: string;
-    [key: string]: any;
+  type: string;
+  content: string;
+  settings: Record<string, unknown>;
+}
+
+interface PageData {
+  sections: PageSection[];
+  meta: {
+    title?: string;
+    description?: string;
   };
 }
 
